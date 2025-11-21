@@ -8,7 +8,7 @@
 define('AUTHOR', 'Douglas Lobo');
 define('ANO_LETIVO', '2025/26');
 
-require_once '../vendor/autoload.php';
+require_once 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable(dirname(__DIR__));
 $dotenv->load();
 
