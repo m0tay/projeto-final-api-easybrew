@@ -1,6 +1,6 @@
 <?php
 
-class User
+class User implements BREAD
 {
 
   // Ligação à BD e tabela
@@ -26,7 +26,7 @@ class User
    * Método para ler todos os elementos da tabela
    * @return PDOStatement Devolve PDOStatement com todos os elementos da tabela
    */
-  function read()
+  function browse()
   {
 
     // SQL
@@ -35,10 +35,10 @@ class User
             FROM
                 " . $this->table_name . "
             ORDER BY
-                username ASC";
+                first_name ASC";
 
     // Preparar
-    $stmt = $this-conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
 
     // Executar
     $stmt->execute();
@@ -51,7 +51,7 @@ class User
    * Método para a inserção de um novo User na DB
    * @return boolean
    */
-  public function create()
+  public function add()
   {
 
     // insert query
@@ -61,25 +61,29 @@ class User
                 first_name = :first_name,
                 last_name = :last_name,
                 password_hash = :password_hash,
-                role = :role,
+                role = 'customer',
                 balance = 0.0";
     // prepare the query
     $stmt = $this->conn->prepare($query);
 
     // sanitize
-    $this->username = filter_var($this->username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
-    $this->avatar = filter_var($this->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $this->password = filter_var($this->password);
+
+    // take first part from user email to attempt to form first and last names out of it
+    $username = preg_split('/[._-]/', explode('@', $this->email)[0]);
+
+    $this->first_name = ucfirst($username[0] ?? 'User');
+    $this->last_name = ucfirst($username[1] ?? '');
+    $this->password_hash = filter_var($this->password_hash);
 
     // bind the values
-    $stmt->bindValue(':username', $this->username);
+    $stmt->bindValue(':first_name', $this->first_name);
+    $stmt->bindValue(':last_name', $this->last_name);
     $stmt->bindValue(':email', $this->email);
-    $stmt->bindValue(':avatar', $this->avatar);
 
     // hash the password before saving to database
-    $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-    $stmt->bindValue(':password', $password_hash);
+    $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
+    $stmt->bindValue(':password_hash', $password_hash);
 
     // execute the query, also check if query was successful
     if ($stmt->execute()) {
@@ -92,7 +96,7 @@ class User
   /**
    * Método para carregar a informação de um registo da Base de Dados
    */
-  function readOne(): void
+  function read()
   {
 
     // Gerar SQL para obter apenas um registo
@@ -111,36 +115,37 @@ class User
     $id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
     $stmt->bindValue(":ID", $id, PDO::PARAM_INT);
 
-a   // Executar query
+    // Executar query
     $stmt->execute();
 
     // Obter resultado
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Instanciar propriedades da Classe
-    $this->username = $row['username'];
+    $this->first_name = $row['first_name'];
+    $this->last_name = $row['last_name'];
     $this->email = $row['email'];
-    $this->avatar = $row['avatar'];
-    $this->password = $row['password'];
+    $this->role = $row['role'];
+    $this->balance = $row['balance'];
+    $this->password_hash = $row['password_hash'];
   }
 
   /**
    * Atualizar um utilizador na base de dados
    * @return boolean
    */
-  public function update()
+  public function edit()
   {
 
     // if password needs to be updated
-    $password_set = !empty($this->password) ? ", password = :password" : "";
-    $avatar_set = !empty($this->avatar) ? ", avatar = :avatar" : "";
+    $password_set = !empty($this->password_hash) ? ", password_hash = :password_hash" : "";
 
     // if no posted password, do not update the password
     $query = "UPDATE " . $this->table_name . "
             SET
-                username = :username,
+                first_name = :first_name,
+                last_name = :last_name,
                 email = :email
-                {$avatar_set}
                 {$password_set}
             WHERE id = :id";
 
@@ -148,24 +153,20 @@ a   // Executar query
     $stmt = $this->conn->prepare($query);
 
     // sanitize
-    $this->username = filter_var($this->username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $this->avatar = filter_var($this->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->first_name = filter_var($this->first_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->last_name = filter_var($this->last_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
-    $this->password = !empty($this->password) ? filter_var($this->password) : '';
+    $this->password_hash = !empty($this->password_hash) ? filter_var($this->password_hash) : '';
 
     // bind the values from the form
-    $stmt->bindValue(':username', $this->username);
+    $stmt->bindValue(':first_name', $this->first_name);
+    $stmt->bindValue(':last_name', $this->last_name);
     $stmt->bindValue(':email', $this->email);
 
     // hash the password before saving to database
-    if (!empty($this->password)) {
-      $password_hash = password_hash($this->password, PASSWORD_DEFAULT);
-      $stmt->bindValue(':password', $password_hash);
-    }
-
-    // 
-    if (!empty($this->avatar)) {
-      $stmt->bindValue(':avatar', $this->avatar);
+    if (!empty($this->password_hash)) {
+      $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
+      $stmt->bindValue(':password_hash', $password_hash);
     }
 
     // unique ID of record to be edited
