@@ -1,0 +1,4 @@
+.env
+vendor/
+api-tests/
+.DS_Store
