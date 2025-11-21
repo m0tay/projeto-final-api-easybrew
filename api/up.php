@@ -3,7 +3,7 @@ require_once '../config.php';
 require_once '../core.php';
 
 $code = 200;
-$response = ['message' => 'ppumbapumbapumbapumbaumba'];
+$response = ['message' => 'Up and alive!'];
 
 header('Content-Type: application/json; charset=UTF-8');
 http_response_code($code);
