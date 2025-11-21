@@ -13,15 +13,11 @@ $data = json_decode(file_get_contents('php://input'));
 
 if (!empty($data)) {
   // Validar dados
-  $user->username = isset($data->username) ? filter_var($data->username, FILTER_UNSAFE_RAW) : '';
-  $user->password = isset($data->password) ? filter_var($data->password, FILTER_UNSAFE_RAW) : '';
+  $user->password_hash = isset($data->password) ? filter_var($data->password, FILTER_UNSAFE_RAW) : '';
   $user->email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : '';
 
   $error = '';
-  if ($user->username == '') {
-    $error .= 'Username não definido. ';
-  }
-  if ($user->password == '') {
+  if ($user->password_hash == '') {
     $error .= 'Password não definida. ';
   }
   if ($user->email == '') {
@@ -32,7 +28,7 @@ if (!empty($data)) {
   }
   if ($error == '') {
     // Criar Utilizador
-    if ($user->create()) {
+    if ($user->add()) {
       // Sucesso na criação - 201 created
       $code = 201;
       $response = ["message" => "Registo criado"];

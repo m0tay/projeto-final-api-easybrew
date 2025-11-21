@@ -7,9 +7,8 @@ require_once '../../objects/User.php';
 $user = new User($pdo);
 // Carregar JWT
 require '../../vendor/autoload.php';
+
 use \Firebase\JWT\JWT;
-// Definição do cabeçalho
-header("Content-Type: application/json; charset=UTF-8");
 // Obter dados do POST
 $data = json_decode(file_get_contents("php://input"));
 if (!empty($data)) {
@@ -27,7 +26,7 @@ if (!empty($data)) {
     $error .= 'Email não existe. ';
   }
   if ($error == '') {
-    if (password_verify($plain_password, $user->password)) {
+    if (password_verify($plain_password, $user->password_hash)) {
       // Criar token
       $token = array(
         "iss" => $jwt_conf['iss'],
@@ -55,7 +54,6 @@ if (!empty($data)) {
   } else {
     // Erros no pedido - 400 bad request
     $code = 400;
-    // Enviar resposta com mensagens de erro
     $response = ["message" => $error];
   }
 } else {
@@ -63,5 +61,7 @@ if (!empty($data)) {
   $code = 400;
   $response = ["message" => "Dados não fornecidos"];
 }
+
+header("Content-Type: application/json; charset=UTF-8");
 http_response_code($code);
 echo json_encode($response);

@@ -9,11 +9,8 @@ require_once '../../objects/User.php';
 $user = new User($pdo);
 
 // Carregar JWT
-require '../../../vendor/autoload.php';
+require '../../vendor/autoload.php';
 use \Firebase\JWT\JWT;
-
-// Definição do cabeçalho
-header("Content-Type: application/json; charset=UTF-8");
 
 // Obter dados do POST
 $data = json_decode(file_get_contents('php://input'));

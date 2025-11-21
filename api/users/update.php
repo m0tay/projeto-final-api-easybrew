@@ -16,7 +16,8 @@ use \Firebase\JWT\JWT;
 
 // Obter dados do POST
 $data = json_decode(file_get_contents('php://input'));
-$user->username = filter_var($data->username, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$user->first_name = filter_var($data->first_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+$user->last_name = filter_var($data->last_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 $user->email = filter_var($data->email, FILTER_VALIDATE_EMAIL);
 
 // Obter JWT
@@ -28,7 +29,7 @@ if ($jwt) {
     // Definição do ID de utilizador
     $user->id = filter_var($decoded->data->id, FILTER_SANITIZE_NUMBER_INT);
     // Atualizar
-    if ($user->update()) {
+    if ($user->edit()) {
       // Gerar novo token
       $token = [
         "iss" => $jwt_conf['iss'],
@@ -38,7 +39,8 @@ if ($jwt) {
         "exp" => $jwt_conf['exp'],
         "data" => [
           "id" => $user->id,
-          "username" => $user->username,
+          "first_name" => $user->first_name,
+          "last_name" => $user->last_name,
           "email" => $user->email
         ],
       ];
