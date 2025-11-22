@@ -2,10 +2,6 @@
 
 interface BREAD
 {
-  private $conn { set; }
-
-  private $table_name { set; }
-
   public function browse();
 
   public function read();

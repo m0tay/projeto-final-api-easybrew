@@ -31,11 +31,11 @@ class User implements BREAD
 
     // SQL
     $query = "SELECT
-                *
-            FROM
-                " . $this->table_name . "
-            ORDER BY
-                first_name ASC";
+      *
+      FROM
+      " . $this->table_name . "
+      ORDER BY
+      first_name ASC";
 
     // Preparar
     $stmt = $this->conn->prepare($query);
@@ -56,13 +56,13 @@ class User implements BREAD
 
     // insert query
     $query = "INSERT INTO " . $this->table_name . "
-            SET
-                email = :email,
-                first_name = :first_name,
-                last_name = :last_name,
-                password_hash = :password_hash,
-                role = 'customer',
-                balance = 0.0";
+      SET
+      email = :email,
+      first_name = :first_name,
+      last_name = :last_name,
+      password_hash = :password_hash,
+      role = 'customer',
+      balance = 0.0";
     // prepare the query
     $stmt = $this->conn->prepare($query);
 
@@ -74,7 +74,6 @@ class User implements BREAD
 
     $this->first_name = ucfirst($username[0] ?? 'User');
     $this->last_name = ucfirst($username[1] ?? '');
-    $this->password_hash = filter_var($this->password_hash);
 
     // bind the values
     $stmt->bindValue(':first_name', $this->first_name);
@@ -101,19 +100,19 @@ class User implements BREAD
 
     // Gerar SQL para obter apenas um registo
     $query = "SELECT
-                *
-            FROM
-                " . $this->table_name . "
-            WHERE
-                id = :ID
-            LIMIT  0,1";
+      *
+      FROM
+      " . $this->table_name . "
+      WHERE
+      id = :ID
+      LIMIT  0,1";
 
     // Preparar a query
     $stmt = $this->conn->prepare($query);
 
     // Filtar vairável e associar valor à query
-    $id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
-    $stmt->bindValue(":ID", $id, PDO::PARAM_INT);
+    $id = filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $stmt->bindValue(":ID", $id);
 
     // Executar query
     $stmt->execute();
@@ -142,12 +141,12 @@ class User implements BREAD
 
     // if no posted password, do not update the password
     $query = "UPDATE " . $this->table_name . "
-            SET
-                first_name = :first_name,
-                last_name = :last_name,
-                email = :email
-                {$password_set}
-            WHERE id = :id";
+      SET
+      first_name = :first_name,
+      last_name = :last_name,
+      email = :email
+    {$password_set}
+    WHERE id = :id";
 
     // prepare the query
     $stmt = $this->conn->prepare($query);
@@ -194,7 +193,7 @@ class User implements BREAD
     $stmt = $this->conn->prepare($query);
 
     // sanitize
-    $this->id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
+    $this->id = filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     // bind id of record to delete
     $stmt->bindValue(1, $this->id);
@@ -213,10 +212,10 @@ class User implements BREAD
 
     // select all query
     $query = "SELECT
-                *
-                FROM " . $this->table_name . "
-                WHERE
-                username LIKE ? OR email LIKE ?";
+      *
+      FROM " . $this->table_name . "
+      WHERE
+      first_name LIKE ? OR last_name LIKE ? OR email LIKE ?";
 
     // prepare query statement
     $stmt = $this->conn->prepare($query);
@@ -242,10 +241,10 @@ class User implements BREAD
 
     // select query
     $query = "SELECT
-                *
-            FROM
-                " . $this->table_name . " 
-            LIMIT ?, ?";
+      *
+      FROM
+      " . $this->table_name . " 
+      LIMIT ?, ?";
 
     // prepare query statement
     $stmt = $this->conn->prepare($query);
@@ -282,9 +281,9 @@ class User implements BREAD
 
     // query to check if email exists
     $query = "SELECT *
-            FROM " . $this->table_name . "
-            WHERE email = ?
-            LIMIT 0,1";
+      FROM " . $this->table_name . "
+      WHERE email = ?
+      LIMIT 0,1";
 
     // prepare the query
     $stmt = $this->conn->prepare($query);
@@ -312,6 +311,9 @@ class User implements BREAD
       $this->first_name = $row['first_name'];
       $this->last_name = $row['last_name'];
       $this->password_hash = $row['password_hash'];
+      $this->role = $row['role'];
+      $this->balance = $row['balance'];
+      $this->is_active = $row['is_active'];
 
       // return true because email exists in the database
       return true;
