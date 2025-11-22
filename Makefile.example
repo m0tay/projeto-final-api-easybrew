@@ -1,0 +1,42 @@
+URL_BASE="https://esan-tesp-ds-paw.web.ua.pt/your_guru/..."
+
+FTP_HOST = myhosting.ua.pt
+FTP_USER = your_email@ua.pt
+FTP_PASS = your_password
+FTP_PATH = /Hosting/esan-tesp-ds-paw.web.ua.pt/your_guru/...
+
+test:
+	http GET "${URL_BASE}/api/up.php"
+	http POST "${URL_BASE}api/users/register.php" @tests/api/create.json
+	http POST "${URL_BASE}api/users/login.php" @tests/api/login.json
+	http POST "${URL_BASE}api/users/update.php" @tests/api/update.json
+	http POST "${URL_BASE}api/users/validate_token.php" @tests/api/validate_token.json
+
+deploy-test:
+	lftp -e "set ftp:ssl-force true; \
+		set ftp:ssl-protect-data true; \
+		set ssl:verify-certificate no; \
+		set mirror:use-pget-n 5; \
+		open -u $(FTP_USER),$(FTP_PASS) $(FTP_HOST); \
+		mirror -Rev --dry-run --no-perms \
+		--exclude .git/ \
+		--exclude .env \
+		--exclude .gitignore \
+		--exclude Makefile \
+		./ $(FTP_PATH); \
+		bye"
+
+deploy:
+	lftp -e "set ftp:ssl-force true; \
+		set ftp:ssl-protect-data true; \
+		set ssl:verify-certificate no; \
+		set mirror:use-pget-n 5; \
+		open -u $(FTP_USER),$(FTP_PASS) $(FTP_HOST); \
+		mirror -Rev --no-perms \
+		--exclude .git/ \
+		--exclude .env \
+		--exclude .gitignore \
+		--exclude Makefile \
+		./ $(FTP_PATH); \
+		bye"
+
