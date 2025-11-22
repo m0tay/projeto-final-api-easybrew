@@ -1,4 +1,5 @@
 .env
 vendor/
 api-tests/
+Makefile
 .DS_Store
