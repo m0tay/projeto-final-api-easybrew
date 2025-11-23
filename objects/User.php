@@ -82,11 +82,16 @@ class User implements BREAD
     $stmt->bindValue(':email', $this->email);
 
     // hash the password before saving to database
+    // the name password_hash may be deceiving, but the $this->password_hash
+    // at this point will be plain text still, only after this execution
+    // it will be then definitely hashed
     $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
     $stmt->bindValue(':password_hash', $password_hash);
 
     // execute the query, also check if query was successful
     if ($stmt->execute()) {
+      // Retrieve the auto-generated UUID
+      $this->id = $this->conn->lastInsertId();
       return true;
     }
 
@@ -122,12 +127,14 @@ class User implements BREAD
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Instanciar propriedades da Classe
+    $this->id = $row['id'];
     $this->first_name = $row['first_name'];
     $this->last_name = $row['last_name'];
     $this->email = $row['email'];
     $this->role = $row['role'];
     $this->balance = $row['balance'];
     $this->password_hash = $row['password_hash'];
+    $this->is_active = $row['is_active'];
   }
 
   /**
