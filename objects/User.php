@@ -1,4 +1,5 @@
 <?php
+include_once 'BREAD.php';
 
 class User implements BREAD
 {
