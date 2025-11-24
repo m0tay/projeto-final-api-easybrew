@@ -8,6 +8,7 @@ $pdo = connectDB($db);
 $machine = new Machine($pdo);
 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 $data = json_decode(file_get_contents('php://input'));
 
@@ -16,7 +17,7 @@ $machine_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPEC
 
 if ($jwt) {
   try {
-    $decoded = JWT::decode($jwt, $jwt_conf['key'], array('HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
 
     if (empty($machine_id)) {
       $code = 400;

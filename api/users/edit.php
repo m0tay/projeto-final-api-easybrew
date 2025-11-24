@@ -12,6 +12,7 @@ $user = new User($pdo);
 require '../../../vendor/autoload.php';
 
 use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
 
 
 // Obter dados do POST
@@ -25,7 +26,7 @@ $jwt = isset($data->jwt) ? $data->jwt : "";
 if ($jwt) {
   try {
     // Decode do JWT
-    $decoded = JWT::decode($jwt, $jwt_conf['key'], array('HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
     // Definição do ID de utilizador
     $user->id = filter_var($decoded->data->id, FILTER_SANITIZE_NUMBER_INT);
     // Atualizar
