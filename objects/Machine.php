@@ -137,4 +137,27 @@ class Machine implements BREAD
 
     return $row['total_rows'];
   }
+  public function search($keywords)
+  {
+    $query = "SELECT
+        *
+        FROM
+        " . $this->table_name . "
+        WHERE
+        machine_code LIKE :machine_code OR location_name LIKE :location_name
+        ORDER BY
+        machine_code ASC";
+
+    $stmt = $this->conn->prepare($query);
+
+    $keywords = filter_var($keywords, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $keywords = "%{$keywords}%";
+
+    $stmt->bindValue(':machine_code', $keywords);
+    $stmt->bindValue(':location_name', $keywords);
+
+    $stmt->execute();
+
+    return $stmt;
+  }
 }
