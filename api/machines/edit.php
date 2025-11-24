@@ -22,7 +22,7 @@ if ($jwt) {
     $machine_code = isset($data->machine_code) ? filter_var($data->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $location_name = isset($data->location_name) ? filter_var($data->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $api_url = isset($data->api_url) ? filter_var($data->api_url, FILTER_SANITIZE_URL) : '';
-    $is_active = isset($data->is_active) ? filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN) : 1;
+    $is_active = isset($data->is_active) ? (filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 1;
 
     if (empty($machine_id) || empty($machine_code) || empty($location_name) || empty($api_url)) {
       $code = 400;

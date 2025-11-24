@@ -29,10 +29,10 @@ if ($jwt) {
 
     if ($machines->rowCount() > 0) {
       $code = 200;
-      $response[] = ['records' => $machines->fetchAll()];
+      $response['records'] = $machines->fetchAll();
     } else {
       $code = 404;
-      $response[] = ['message' => 'Sem registros'];
+      $response['message'] = 'Sem registros';
     }
   } catch (Exception $e) {
     $code = 401;
