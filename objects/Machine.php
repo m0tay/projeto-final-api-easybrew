@@ -88,7 +88,8 @@ class Machine implements BREAD
       SET
       machine_code = :machine_code,
       location_name = :location_name,
-      api_url = :api_url
+      api_url = :api_url,
+      is_active = :is_active
       WHERE id = :id ";
 
     $stmt = $this->conn->prepare($query);
@@ -100,6 +101,7 @@ class Machine implements BREAD
     $stmt->bindValue(':machine_code', $this->machine_code);
     $stmt->bindValue(':location_name', $this->location_name);
     $stmt->bindValue(':api_url', $this->api_url);
+    $stmt->bindValue(':is_active', $this->is_active);
     $stmt->bindValue(':id', $this->id);
 
     if ($stmt->execute()) {
