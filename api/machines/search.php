@@ -12,32 +12,23 @@ use \Firebase\JWT\JWT;
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
-$machine_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
+$keywords = isset($data->keywords) ? $data->keywords : '';
 
 if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, $jwt_conf['key'], array('HS256'));
-
-    if (empty($machine_id)) {
-      $code = 400;
-      $response = ['message' => 'ID da máquina não fornecido'];
-    } else {
-      $machine->id = $machine_id;
-      $machine->read();
-
-      if ($machine->machine_code != null) {
+    if (!empty($keywords)) {
+      $stmt = $machine->search($keywords);
+      if ($stmt->rowCount() > 0) {
         $code = 200;
-        $response = [
-          'id' => $machine->id,
-          'machine_code' => $machine->machine_code,
-          'location_name' => $machine->location_name,
-          'api_url' => $machine->api_url,
-          'is_active' => $machine->is_active
-        ];
+        $response = ['records' => $stmt->fetchAll(PDO::FETCH_ASSOC)];
       } else {
         $code = 404;
-        $response = ['message' => 'Máquina não encontrada'];
+        $response = ['message' => 'Sem registros encontrados'];
       }
+    } else {
+      $code = 400;
+      $response = ['message' => 'Palavra-chave não fornecida'];
     }
   } catch (Exception $e) {
     $code = 401;
@@ -45,7 +36,7 @@ if ($jwt) {
   }
 } else {
   $code = 401;
-  $response = ['message' => 'Acesso negado: Token JWT não fornecido'];
+  $response = ['message' => 'Acesso negado: Token não fornecido'];
 }
 
 header('Content-Type: application/json; charset=UTF-8');
