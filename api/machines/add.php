@@ -18,6 +18,15 @@ if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
 
+    if (!isset($decoded->data->role) || $decoded->data->role !== 'admin') {
+      $code = 403;
+      $response = ['message' => 'Acesso negado: apenas administradores podem adicionar máquinas'];
+      header('Content-Type: application/json; charset=UTF-8');
+      http_response_code($code);
+      echo json_encode($response);
+      exit();
+    }
+
     $machine_code = isset($data->machine_code) ? filter_var($data->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $location_name = isset($data->location_name) ? filter_var($data->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $api_url = isset($data->api_url) ? filter_var($data->api_url, FILTER_SANITIZE_URL) : '';

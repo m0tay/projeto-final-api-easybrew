@@ -18,6 +18,16 @@ $keywords = isset($data->keywords) ? $data->keywords : '';
 if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+
+    if (!isset($decoded->data->role) || $decoded->data->role !== 'admin') {
+      $code = 403;
+      $response = ['message' => 'Acesso negado: apenas administradores podem buscar máquinas'];
+      header('Content-Type: application/json; charset=UTF-8');
+      http_response_code($code);
+      echo json_encode($response);
+      exit();
+    }
+
     if (!empty($keywords)) {
       $stmt = $machine->search($keywords);
       if ($stmt->rowCount() > 0) {

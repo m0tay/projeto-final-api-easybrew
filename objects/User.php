@@ -188,6 +188,64 @@ class User implements BREAD
   }
 
   /**
+   * Atualizar um utilizador (admin) - permite editar role, balance e is_active
+   * @return boolean
+   */
+  public function adminEdit()
+  {
+
+    // if password needs to be updated
+    $password_set = !empty($this->password_hash) ? ", password_hash = :password_hash" : "";
+
+    $query = "UPDATE " . $this->table_name . "
+      SET
+      first_name = :first_name,
+      last_name = :last_name,
+      email = :email,
+      role = :role,
+      balance = :balance,
+      is_active = :is_active
+    {$password_set}
+    WHERE id = :id";
+
+    // prepare the query
+    $stmt = $this->conn->prepare($query);
+
+    // sanitize
+    $this->first_name = filter_var($this->first_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->last_name = filter_var($this->last_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
+    $this->role = filter_var($this->role, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->balance = filter_var($this->balance, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
+    $this->is_active = filter_var($this->is_active, FILTER_SANITIZE_NUMBER_INT);
+    $this->password_hash = !empty($this->password_hash) ? filter_var($this->password_hash) : '';
+
+    // bind the values from the form
+    $stmt->bindValue(':first_name', $this->first_name);
+    $stmt->bindValue(':last_name', $this->last_name);
+    $stmt->bindValue(':email', $this->email);
+    $stmt->bindValue(':role', $this->role);
+    $stmt->bindValue(':balance', $this->balance);
+    $stmt->bindValue(':is_active', $this->is_active);
+
+    // hash the password before saving to database
+    if (!empty($this->password_hash)) {
+      $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
+      $stmt->bindValue(':password_hash', $password_hash);
+    }
+
+    // unique ID of record to be edited
+    $stmt->bindValue(':id', $this->id);
+
+    // execute the query
+    if ($stmt->execute()) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
    * Apaga registo
    * @return boolean
    */

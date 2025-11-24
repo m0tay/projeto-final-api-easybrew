@@ -1,51 +1,71 @@
 <?php
-
-// Carregar configurações
 require_once '../../config.php';
 require_once '../../core.php';
-$pdo = connectDB($db);
-// Carregar classe
 require_once '../../objects/User.php';
+require '../../vendor/autoload.php';
+
+$pdo = connectDB($db);
 $user = new User($pdo);
 
-// Obter dados do POST
+use \Firebase\JWT\JWT;
+use \Firebase\JWT\Key;
+
 $data = json_decode(file_get_contents('php://input'));
 
-if (!empty($data)) {
-  // Validar dados
-  $user->password_hash = isset($data->password) ? filter_var($data->password, FILTER_UNSAFE_RAW) : '';
-  $user->email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : '';
+$jwt = isset($data->jwt) ? $data->jwt : '';
 
-  $error = '';
-  if ($user->password_hash == '') {
-    $error .= 'Password não definida. ';
-  }
-  if ($user->email == '') {
-    $error .= 'Email não definido. ';
-  }
-  if ($user->emailExists()) {
-    $error .= 'Email já registado. ';
-  }
-  if ($error == '') {
-    // Criar Utilizador
-    if ($user->add()) {
-      // Sucesso na criação - 201 created
-      $code = 201;
-      $response = ["message" => "Registo criado"];
+if ($jwt) {
+  try {
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+
+    if ($decoded->data->role !== 'admin') {
+      $code = 403;
+      $response = ['message' => 'Acesso negado: Permissões insuficientes'];
     } else {
-      // Erros no pedido - 503 service unavailable
-      $code = 503;
-      $response = ["error" => "Erro ao criar registo"];
+      if (!empty($data)) {
+        // Validar dados
+        $user->password_hash = isset($data->password) ? filter_var($data->password, FILTER_UNSAFE_RAW) : '';
+        $user->email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : '';
+
+        $error = '';
+        if ($user->password_hash == '') {
+          $error .= 'Password não definida. ';
+        }
+        if ($user->email == '') {
+          $error .= 'Email não definido. ';
+        }
+        if ($user->emailExists()) {
+          $error .= 'Email já registado. ';
+        }
+        if ($error == '') {
+          // Criar Utilizador
+          if ($user->add()) {
+            // Sucesso na criação - 201 created
+            $code = 201;
+            $response = ['message' => 'Utilizador criado com sucesso', 'id' => $user->id];
+          } else {
+            // Erros no pedido - 503 service unavailable
+            $code = 503;
+            $response = ['message' => 'Erro ao criar utilizador'];
+          }
+        } else {
+          // Erros no pedido - 400 bad request
+          $code = 400;
+          $response = ['message' => $error];
+        }
+      } else {
+        // Erros no pedido - 400 bad request
+        $code = 400;
+        $response = ['message' => 'Pedido sem informação'];
+      }
     }
-  } else {
-    // Erros no pedido - 400 bad request
-    $code = 400;
-    $response = ["error" => "Erro no pedido: #error"];
+  } catch (Exception $e) {
+    $code = 401;
+    $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
   }
 } else {
-  // Erros no pedido - 400 bad request
-  $code = 400;
-  $response = ["error" => "Pedido sem informação"];
+  $code = 401;
+  $response = ['message' => 'Acesso negado: Token JWT não fornecido'];
 }
 
 header('Content-Type: application/json; charset=UTF-8');

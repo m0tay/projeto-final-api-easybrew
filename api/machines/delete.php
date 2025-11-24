@@ -19,6 +19,15 @@ if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
 
+    if (!isset($decoded->data->role) || $decoded->data->role !== 'admin') {
+      $code = 403;
+      $response = ['message' => 'Acesso negado: apenas administradores podem deletar máquinas'];
+      header('Content-Type: application/json; charset=UTF-8');
+      http_response_code($code);
+      echo json_encode($response);
+      exit();
+    }
+
     if (empty($machine_id)) {
       $code = 400;
       $response = ['message' => 'ID da máquina não fornecido'];
