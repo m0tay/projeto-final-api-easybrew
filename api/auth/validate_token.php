@@ -12,7 +12,7 @@ use \Firebase\JWT\JWT;
 
 $data = json_decode(file_get_contents('php://input'));
 
-$jwt = isset($data->jwt) ? $data->jwt : "";
+$jwt = isset($data->jwt) ? $data->jwt : '';
 
 if ($jwt) {
   try {
@@ -29,11 +29,11 @@ if ($jwt) {
     ];
   } catch (Exception $e) {
     $code = 401;
-    $response = ['error' => 'Acesso negado: ' . $e->getMessage()];
+    $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
   }
 } else {
   $code = 401;
-  $response = ['error' => 'Acesso negado: ' . $e->getMessage()];
+  $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
 }
 
 header('Content-Type: application/json; charset=UTF-8');
