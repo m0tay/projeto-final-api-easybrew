@@ -30,17 +30,17 @@ if ($jwt) {
     $machine_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $machine_code = isset($data->machine_code) ? filter_var($data->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $location_name = isset($data->location_name) ? filter_var($data->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
-    $api_url = isset($data->api_url) ? filter_var($data->api_url, FILTER_SANITIZE_URL) : '';
+    $api_address = isset($data->api_address) ? filter_var($data->api_address, FILTER_SANITIZE_URL) : '';
     $is_active = isset($data->is_active) ? (filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) ? 1 : 0) : 1;
 
-    if (empty($machine_id) || empty($machine_code) || empty($location_name) || empty($api_url)) {
+    if (empty($machine_id) || empty($machine_code) || empty($location_name) || empty($api_address)) {
       $code = 400;
-      $response = ['message' => 'Campos obrigatórios faltando: id, machine_code, location_name, api_url'];
+      $response = ['message' => 'Campos obrigatórios faltando: id, machine_code, location_name, api_address'];
     } else {
       $machine->id = $machine_id;
       $machine->machine_code = $machine_code;
       $machine->location_name = $location_name;
-      $machine->api_url = $api_url;
+      $machine->api_address = $api_address;
       $machine->is_active = $is_active;
 
 

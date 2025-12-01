@@ -9,7 +9,7 @@ class Machine implements BREAD
   public $id;
   public $machine_code;
   public $location_name;
-  public $api_url;
+  public $api_address;
   public $is_active;
 
   /**
@@ -56,7 +56,7 @@ class Machine implements BREAD
     $this->id = $row['id'];
     $this->machine_code = $row['machine_code'];
     $this->location_name = $row['location_name'];
-    $this->api_url = $row['api_url'];
+    $this->api_address = $row['api_address'];
     $this->is_active = $row['is_active'];
   }
   public function add()
@@ -66,13 +66,13 @@ class Machine implements BREAD
       SET
       machine_code = :machine_code,
       location_name = :location_name,
-      api_url = :api_url";
+      api_address = :api_address";
 
     $stmt = $this->conn->prepare($query);
 
     $stmt->bindValue(':machine_code', $this->machine_code);
     $stmt->bindValue(':location_name', $this->location_name);
-    $stmt->bindValue(':api_url', $this->api_url);
+    $stmt->bindValue(':api_address', $this->api_address);
 
     if ($stmt->execute()) {
       $this->id = $this->conn->lastInsertId();
@@ -88,7 +88,7 @@ class Machine implements BREAD
       SET
       machine_code = :machine_code,
       location_name = :location_name,
-      api_url = :api_url,
+      api_address = :api_address,
       is_active = :is_active
       WHERE id = :id ";
 
@@ -96,11 +96,11 @@ class Machine implements BREAD
 
     $this->machine_code = filter_var($this->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->location_name = filter_var($this->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $this->api_url = filter_var($this->api_url, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->api_address = filter_var($this->api_address, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     $stmt->bindValue(':machine_code', $this->machine_code);
     $stmt->bindValue(':location_name', $this->location_name);
-    $stmt->bindValue(':api_url', $this->api_url);
+    $stmt->bindValue(':api_address', $this->api_address);
     $stmt->bindValue(':is_active', $this->is_active);
     $stmt->bindValue(':id', $this->id);
 

@@ -29,15 +29,15 @@ if ($jwt) {
 
     $machine_code = isset($data->machine_code) ? filter_var($data->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
     $location_name = isset($data->location_name) ? filter_var($data->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
-    $api_url = isset($data->api_url) ? filter_var($data->api_url, FILTER_SANITIZE_URL) : '';
+    $api_address = isset($data->api_address) ? filter_var($data->api_address, FILTER_SANITIZE_URL) : '';
 
-    if (empty($machine_code) || empty($location_name) || empty($api_url)) {
+    if (empty($machine_code) || empty($location_name) || empty($api_address)) {
       $code = 400;
-      $response = ['message' => 'Campos obrigatórios faltando: machine_code, location_name, api_url'];
+      $response = ['message' => 'Campos obrigatórios faltando: machine_code, location_name, api_address'];
     } else {
       $machine->machine_code = $machine_code;
       $machine->location_name = $location_name;
-      $machine->api_url = $api_url;
+      $machine->api_address = $api_address;
 
       if ($machine->add()) {
         $code = 201;

@@ -41,7 +41,7 @@ if ($jwt) {
           'id' => $machine->id,
           'machine_code' => $machine->machine_code,
           'location_name' => $machine->location_name,
-          'api_url' => $machine->api_url,
+          'api_address' => $machine->api_address,
           'is_active' => $machine->is_active
         ];
       } else {
