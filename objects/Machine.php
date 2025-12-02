@@ -53,11 +53,13 @@ class Machine implements BREAD
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    $this->id = $row['id'];
-    $this->machine_code = $row['machine_code'];
-    $this->location_name = $row['location_name'];
-    $this->api_address = $row['api_address'];
-    $this->is_active = $row['is_active'];
+    if ($row) {
+      $this->id = $row['id'];
+      $this->machine_code = $row['machine_code'];
+      $this->location_name = $row['location_name'];
+      $this->api_address = $row['api_address'];
+      $this->is_active = $row['is_active'];
+    }
   }
   public function add()
   {
@@ -138,7 +140,7 @@ class Machine implements BREAD
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $row['total_rows'];
+    return $row ? $row['total_rows'] : 0;
   }
   public function search($keywords)
   {

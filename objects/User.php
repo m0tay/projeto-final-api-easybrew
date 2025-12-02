@@ -127,14 +127,16 @@ class User implements BREAD
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     // Instanciar propriedades da Classe
-    $this->id = $row['id'];
-    $this->first_name = $row['first_name'];
-    $this->last_name = $row['last_name'];
-    $this->email = $row['email'];
-    $this->role = $row['role'];
-    $this->balance = $row['balance'];
-    $this->password_hash = $row['password_hash'];
-    $this->is_active = $row['is_active'];
+    if ($row) {
+      $this->id = $row['id'];
+      $this->first_name = $row['first_name'];
+      $this->last_name = $row['last_name'];
+      $this->email = $row['email'];
+      $this->role = $row['role'];
+      $this->balance = $row['balance'];
+      $this->password_hash = $row['password_hash'];
+      $this->is_active = $row['is_active'];
+    }
   }
 
   /**
@@ -335,7 +337,7 @@ class User implements BREAD
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    return $row['total_rows'];
+    return $row ? $row['total_rows'] : 0;
   }
 
   /**
