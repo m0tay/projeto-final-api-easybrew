@@ -13,7 +13,7 @@ $machine = new Machine($pdo);
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
-$machine_id = isset($data->machine_id) ? filter_var($data->machine_id, FILTER_SANITIZE_NUMBER_INT) : '';
+$machine_id = isset($data->machine_id) ? filter_var($data->machine_id, FILTER_SANITIZE_SPECIAL_CHARS) : '';
 
 if ($jwt) {
   try {
@@ -24,29 +24,35 @@ if ($jwt) {
       $response = ['message' => 'ID da máquina não fornecido'];
     } else {
       $machine->id = $machine_id;
-      $machineRow = $machine->read();
-      
-      if (!$machineRow) {
+
+      /* var_dump($data); */
+      /* var_dump($machine); */
+      /* die(); */
+
+      if (!$machine->read()) {
         $code = 404;
         $response = ['message' => 'Máquina não encontrada'];
       } else {
-        if ($machine->is_active != 1) {
+        if (!filter_var($machine->is_active, FILTER_VALIDATE_BOOLEAN) ? true : false) {
           $code = 403;
           $response = ['message' => 'Máquina não está ativa'];
         } else {
-          $api_url = rtrim($machine->api_address, '/');
-          $menu_url = $api_url . '/' . $machine->machine_code . '/api/menu.php';
-          
-          $ch = curl_init($menu_url);
+          $menu_url = $machine->api_address . $machine->machine_code . '/api/menu.php';
+          $host = parse_url($menu_url, PHP_URL_HOST);
+
+          $ch = curl_init();
+          curl_setopt($ch, CURLOPT_URL, $menu_url);
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
           curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-          curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-          
+          curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json; Host: ' . $host ]);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // <-- aplicar esta linha
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // <-- aplicar esta linha
+
           $menu_response = curl_exec($ch);
           $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
           $curl_error = curl_error($ch);
           curl_close($ch);
-          
+
           if ($menu_response === false || $http_code !== 200) {
             $code = 503;
             $response = [
@@ -55,22 +61,14 @@ if ($jwt) {
             ];
           } else {
             $menu_data = json_decode($menu_response, true);
-            
+
             if (json_last_error() !== JSON_ERROR_NONE) {
               $code = 500;
               $response = ['message' => 'Erro ao processar resposta da máquina'];
             } else {
               $code = 200;
               $response = [
-                'message' => 'Menu obtido com sucesso',
-                'machine' => [
-                  'id' => $machine->id,
-                  'machine_code' => $machine->machine_code,
-                  'location_name' => $machine->location_name,
-                  'api_address' => $machine->api_address,
-                  'is_active' => $machine->is_active
-                ],
-                'menu' => $menu_data
+                'records' => $menu_data['records'] ?? []
               ];
             }
           }

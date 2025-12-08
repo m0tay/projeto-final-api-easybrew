@@ -37,18 +37,10 @@ class Machine implements BREAD
   }
   public function read()
   {
-    $query = "SELECT
-      *
-      FROM
-      " . $this->table_name . "
-      WHERE
-      id = :id
-      limit 1";
+    $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
 
     $stmt = $this->conn->prepare($query);
-
-    $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_SPECIAL_CHARS));
-
+    $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->execute();
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -59,7 +51,11 @@ class Machine implements BREAD
       $this->location_name = $row['location_name'];
       $this->api_address = $row['api_address'];
       $this->is_active = $row['is_active'];
+
+      return true;
     }
+
+    return false;
   }
   public function add()
   {
