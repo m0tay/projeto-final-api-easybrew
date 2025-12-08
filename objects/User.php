@@ -47,6 +47,47 @@ class User implements BREAD
     return $stmt;
   }
 
+  /**
+   * Método para carregar a informação de um registo da Base de Dados
+   */
+  function read()
+  {
+
+    // Gerar SQL para obter apenas um registo
+    $query = "SELECT
+      *
+      FROM
+      " . $this->table_name . "
+      WHERE
+      id = :ID
+      LIMIT  0,1";
+
+    // Preparar a query
+    $stmt = $this->conn->prepare($query);
+
+    // Filtar vairável e associar valor à query
+    $id = filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $stmt->bindValue(":ID", $id);
+
+    // Executar query
+    $stmt->execute();
+
+    // Obter resultado
+    $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    // Instanciar propriedades da Classe
+    if ($row) {
+      $this->id = $row['id'];
+      $this->first_name = $row['first_name'];
+      $this->last_name = $row['last_name'];
+      $this->email = $row['email'];
+      $this->role = $row['role'];
+      $this->balance = $row['balance'];
+      $this->password_hash = $row['password_hash'];
+      $this->is_active = $row['is_active'];
+    }
+  }
+
 
   /**
    * Método para a inserção de um novo User na DB
@@ -96,47 +137,6 @@ class User implements BREAD
     }
 
     return false;
-  }
-
-  /**
-   * Método para carregar a informação de um registo da Base de Dados
-   */
-  function read()
-  {
-
-    // Gerar SQL para obter apenas um registo
-    $query = "SELECT
-      *
-      FROM
-      " . $this->table_name . "
-      WHERE
-      id = :ID
-      LIMIT  0,1";
-
-    // Preparar a query
-    $stmt = $this->conn->prepare($query);
-
-    // Filtar vairável e associar valor à query
-    $id = filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $stmt->bindValue(":ID", $id);
-
-    // Executar query
-    $stmt->execute();
-
-    // Obter resultado
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    // Instanciar propriedades da Classe
-    if ($row) {
-      $this->id = $row['id'];
-      $this->first_name = $row['first_name'];
-      $this->last_name = $row['last_name'];
-      $this->email = $row['email'];
-      $this->role = $row['role'];
-      $this->balance = $row['balance'];
-      $this->password_hash = $row['password_hash'];
-      $this->is_active = $row['is_active'];
-    }
   }
 
   /**
