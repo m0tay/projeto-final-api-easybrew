@@ -44,10 +44,12 @@ if (!empty($data)) {
           'exp' => $jwt_conf['exp'],
           'data' => array(
             'id' => $user->id,
+            'email' => $user->email,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'role' => $user->role,
-            'email' => $user->email
+            'balance' => $user->balance,
+            'is_active' => $user->is_active
           )
         );
         $jwt = JWT::encode($token, $jwt_conf['key'], $jwt_conf['alg']);

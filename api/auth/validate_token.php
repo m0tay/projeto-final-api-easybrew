@@ -27,6 +27,15 @@ if ($jwt) {
       'data' => $decoded->data,
       'expiration' => date('c', $decoded->exp),
       'timeleft' => $decoded->exp - time(),
+      'data' => array(
+        'id' => $user->id,
+        'email' => $user->email,
+        'first_name' => $user->first_name,
+        'last_name' => $user->last_name,
+        'role' => $user->role,
+        'balance' => $user->balance,
+        'is_active' => $user->is_active
+      )
     ];
   } catch (Exception $e) {
     $code = 403;
