@@ -18,7 +18,7 @@ $jwt = isset($data->jwt) ? $data->jwt : '';
 if ($jwt) {
   try {
     // Decode do JWT
-    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
     // Sucesso na operação - 200 OK
     $code = 200;
     // Enviar Resposta
@@ -29,7 +29,7 @@ if ($jwt) {
       'timeleft' => $decoded->exp - time(),
     ];
   } catch (Exception $e) {
-    $code = 401;
+    $code = 403;
     $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
   }
 } else {

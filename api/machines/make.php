@@ -24,7 +24,7 @@ $preparation = isset($data->preparation) ? filter_var($data->preparation, FILTER
 
 if ($jwt) {
   try {
-    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
 
     if (empty($machine_id) || empty($user_id) || empty($beverage_id) || empty($preparation)) {
       $code = 400;
@@ -115,7 +115,7 @@ if ($jwt) {
                   'message' => 'Bebida preparada com sucesso',
                   'beverage' => $beverage_name,
                   'preparation' => $preparation,
-                  'amount' => $beverage_price,
+                  'price' => $beverage_price,
                   'new_balance' => $new_balance,
                   'response_time_ms' => $response_time,
                 ];

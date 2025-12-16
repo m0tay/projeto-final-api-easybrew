@@ -50,7 +50,7 @@ if (!empty($data)) {
             'email' => $user->email
           )
         );
-        $jwt = JWT::encode($token, $jwt_conf['key'], 'HS256');
+        $jwt = JWT::encode($token, $jwt_conf['key'], $jwt_conf['alg']);
         $code = 200;
         $response = ['message' => 'Registado com sucesso', 'jwt' => $jwt];
       } else {

@@ -17,7 +17,7 @@ $machine_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPEC
 
 if ($jwt) {
   try {
-    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
 
     if (!isset($decoded->data->role) || $decoded->data->role !== 'admin') {
       $code = 403;

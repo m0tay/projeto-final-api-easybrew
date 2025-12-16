@@ -48,6 +48,7 @@ $jwt_conf = [
   'iat' => time(),
   'nbf' => time(),
   'exp' => time() + (int)$_ENV['JWT_EXP'],
+  'alg' => 'HS256',
 ];
 
 /* * * * * * * * * *

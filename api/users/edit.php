@@ -22,7 +22,7 @@ $data = json_decode(file_get_contents('php://input'));
 $jwt = isset($data->jwt) ? $data->jwt : "";
 if ($jwt) {
   try {
-    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
     
     $target_user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_NUMBER_INT) : $decoded->data->id;
     
@@ -86,7 +86,7 @@ if ($jwt) {
               ];
               $code = 200;
               // Criar novo JWT
-              $jwt = JWT::encode($token, $jwt_conf['key'], 'HS256');
+              $jwt = JWT::encode($token, $jwt_conf['key'], $jwt_conf['alg']);
               // Enviar resposta
               $response = ['message' => 'Atualizado com sucesso', 'jwt' => $jwt];
             } else {
@@ -104,8 +104,7 @@ if ($jwt) {
       }
     }
   } catch (Exception $e) {
-    // Acesso negado - 401 Unauthorized
-    $code = 401;
+    $code = 500;
     // Enviar resposta com mensagens de erro
     $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
   }

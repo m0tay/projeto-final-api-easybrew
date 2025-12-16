@@ -17,7 +17,7 @@ $machine_id = isset($data->machine_id) ? filter_var($data->machine_id, FILTER_SA
 
 if ($jwt) {
   try {
-    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], 'HS256'));
+    $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
 
     if (empty($machine_id)) {
       $code = 400;
