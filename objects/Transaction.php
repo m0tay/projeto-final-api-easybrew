@@ -41,6 +41,27 @@ class Transaction implements BREAD
 
     return $stmt;
   }
+
+  public function browseByUser()
+  {
+    $query = "SELECT
+      *
+      FROM
+      " . $this->table_name . "
+      WHERE
+      user_id = :user_id
+      ORDER BY
+      created_at DESC";
+
+    $stmt = $this->conn->prepare($query);
+
+    $stmt->bindValue(':user_id', filter_var($this->user_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+
+    $stmt->execute();
+
+    return $stmt;
+  }
+
   public function read()
   {
     $query = "SELECT
