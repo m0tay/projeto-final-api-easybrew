@@ -68,12 +68,7 @@ if ($jwt) {
                 $code = 400;
                 $response = ['message' => 'Saldo insuficiente'];
               } else {
-                $user->balance -= $transaction->amount;
-                $update_query = "UPDATE users SET balance = :balance WHERE id = :id";
-                $stmt = $pdo->prepare($update_query);
-                $stmt->bindValue(':balance', $user->balance);
-                $stmt->bindValue(':id', $user->id);
-                $stmt->execute();
+                $user->deductBalance($transaction->amount);
                 
                 if ($transaction->add()) {
                   $pdo->commit();
@@ -88,13 +83,7 @@ if ($jwt) {
             } elseif ($transaction->type === 'deposit' && $transaction->status === 'completed') {
               $user->id = $transaction->user_id;
               $user->read();
-              $user->balance += $transaction->amount;
-              
-              $update_query = "UPDATE users SET balance = :balance WHERE id = :id";
-              $stmt = $pdo->prepare($update_query);
-              $stmt->bindValue(':balance', $user->balance);
-              $stmt->bindValue(':id', $user->id);
-              $stmt->execute();
+              $user->addBalance($transaction->amount);
               
               if ($transaction->add()) {
                 $pdo->commit();
