@@ -389,4 +389,68 @@ class User implements BREAD
     // return false if email does not exist in the database
     return false;
   }
+
+  /**
+   * Deduz um valor do saldo do utilizador
+   * @param float $amount Valor a deduzir
+   * @return boolean
+   */
+  public function deductBalance($amount)
+  {
+    if ($amount < 0) {
+      return false;
+    }
+
+    if ($this->balance < $amount) {
+      return false;
+    }
+
+    $this->balance -= $amount;
+
+    $query = "UPDATE " . $this->table_name . "
+      SET balance = :balance
+      WHERE id = :id";
+
+    $stmt = $this->conn->prepare($query);
+
+    $balance = filter_var($this->balance, FILTER_VALIDATE_FLOAT);
+    $stmt->bindValue(':balance', $balance);
+    $stmt->bindValue(':id', $this->id);
+
+    if ($stmt->execute()) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Adiciona um valor ao saldo do utilizador
+   * @param float $amount Valor a adicionar
+   * @return boolean
+   */
+  public function addBalance($amount)
+  {
+    if ($amount < 0) {
+      return false;
+    }
+
+    $this->balance += $amount;
+
+    $query = "UPDATE " . $this->table_name . "
+      SET balance = :balance
+      WHERE id = :id";
+
+    $stmt = $this->conn->prepare($query);
+
+    $balance = filter_var($this->balance, FILTER_VALIDATE_FLOAT);
+    $stmt->bindValue(':balance', $balance);
+    $stmt->bindValue(':id', $this->id);
+
+    if ($stmt->execute()) {
+      return true;
+    }
+
+    return false;
+  }
 }
