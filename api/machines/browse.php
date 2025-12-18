@@ -42,7 +42,7 @@ if ($jwt) {
   }
 } else {
   $code = 401;
-  $response = ['message' => 'Acesso negado: ' . $e->getMessage()];
+  $response = ['message' => 'Acesso negado: Token não fornecido'];
 }
 
 

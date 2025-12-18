@@ -13,7 +13,7 @@ $machine = new Machine($pdo);
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
-$machine_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
+$machine_id = isset($data->machine_id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 
 if ($jwt) {
   try {
@@ -84,7 +84,7 @@ if ($jwt) {
   }
 } else {
   $code = 401;
-  $response = ['message' => 'Acesso negado'];
+  $response = ['message' => 'Acesso negado: Token não fornecido'];
 }
 
 header('Content-Type: application/json; charset=UTF-8');

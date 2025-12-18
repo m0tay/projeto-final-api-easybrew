@@ -81,7 +81,7 @@ if ($jwt) {
   }
 } else {
   $code = 401;
-  $response = ['message' => 'Acesso negado'];
+  $response = ['message' => 'Acesso negado: Token não fornecido'];
 }
 
 header('Content-Type: application/json; charset=UTF-8');

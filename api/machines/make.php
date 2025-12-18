@@ -69,6 +69,8 @@ if ($jwt) {
             'Content-Length: ' . strlen($payload)
           ]);
           curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
           curl_setopt($ch, CURLOPT_HEADER, false);
           $response_body = curl_exec($ch);
           $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -142,7 +144,7 @@ if ($jwt) {
   }
 } else {
   $code = 401;
-  $response = ['message' => 'Acesso negado'];
+  $response = ['message' => 'Acesso negado: Token não fornecido'];
 }
 
 header('Content-Type: application/json; charset=UTF-8');
