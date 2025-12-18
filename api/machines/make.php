@@ -93,12 +93,7 @@ if ($jwt) {
               $pdo->beginTransaction();
 
               try {
-                $new_balance = $user->balance - $beverage_price;
-                $update_query = "UPDATE users SET balance = :balance WHERE id = :user_id";
-                $update_stmt = $pdo->prepare($update_query);
-                $update_stmt->bindValue(':balance', $new_balance);
-                $update_stmt->bindValue(':user_id', $user_id);
-                $update_stmt->execute();
+                $user->deductBalance($beverage_price);
 
                 $transaction->user_id = $user_id;
                 $transaction->machine_id = $machine_id;
@@ -118,7 +113,7 @@ if ($jwt) {
                   'beverage' => $beverage_name,
                   'preparation' => $preparation,
                   'price' => $beverage_price,
-                  'new_balance' => $new_balance,
+                  'new_balance' => $user->balance,
                   'response_time_ms' => $response_time,
                 ];
               } catch (Exception $e) {
