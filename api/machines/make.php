@@ -36,7 +36,7 @@ if ($jwt) {
       if (empty($user->id)) {
         $code = 404;
         $response = ['message' => 'Utilizador não encontrado'];
-      } else if (!$user->is_active) {
+      } else if (!boolval($user->is_active)) {
         $code = 403;
         $response = ['message' => 'Utilizador inativo'];
       } else {
@@ -46,7 +46,7 @@ if ($jwt) {
         if (empty($machine->id)) {
           $code = 404;
           $response = ['message' => 'Máquina não encontrada'];
-        } else if (!$machine->is_active) {
+        } else if (!boolval($machine->is_active)) {
           $code = 403;
           $response = ['message' => 'Máquina inativa'];
         } else if (empty($machine->api_address)) {

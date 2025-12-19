@@ -33,7 +33,7 @@ if ($jwt) {
         $code = 404;
         $response = ['message' => 'Máquina não encontrada'];
       } else {
-        if (!filter_var($machine->is_active, FILTER_VALIDATE_BOOLEAN) ? true : false) {
+        if (!boolval($machine->is_active)) {
           $code = 403;
           $response = ['message' => 'Máquina não está ativa'];
         } else {

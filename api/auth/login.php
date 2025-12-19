@@ -30,7 +30,7 @@ if (!empty($data)) {
       $code = 401;
       $response = ['message' => 'Credenciais inválidas'];
     } else {
-      if (!$user->is_active) {
+      if (!boolval($user->is_active)) {
         $code = 403; // Forbidden BE GONE, PEASANT
         $response = ['message' => 'Conta desativada'];
       } else if (password_verify($plain_password, $user->password_hash)) {
