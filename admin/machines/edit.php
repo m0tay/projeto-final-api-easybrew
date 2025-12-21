@@ -1,10 +1,35 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../config_local.php';
+    require_once __DIR__ . '/../includes/api_helper.php';
+    
+    $result = callAPI('machines/edit.php', [
+        'id' => $_POST['id'],
+        'machine_code' => $_POST['machine_code'],
+        'location_name' => $_POST['location_name'],
+        'api_address' => $_POST['api_address'],
+        'is_active' => $_POST['is_active']
+    ]);
+    
+    if (isset($result['http_code']) && $result['http_code'] == 200) {
+        header('Location: ' . ADMIN_BASE_PATH . '/machines/browse.php');
+        exit;
+    }
+}
+
 require_once __DIR__ . '/../includes/header.php';
 
 $error = '';
 $machine = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    $error = $result['message'] ?? 'Erro ao atualizar máquina';
+    $machine = callAPI('machines/read.php', ['id' => $_POST['id']]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
     $machine_id = $_POST['id'] ?? null;
     if ($machine_id) {
         $machine = callAPI('machines/read.php', ['id' => $machine_id]);
@@ -14,33 +39,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
     }
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
-    $result = callAPI('machines/edit.php', [
-        'id' => $_POST['id'],
-        'machine_code' => $_POST['machine_code'],
-        'location_name' => $_POST['location_name'],
-        'api_address' => $_POST['api_address'],
-        'is_active' => $_POST['is_active']
-    ]);
-    
-    if (isset($result['message']) && strpos($result['message'], 'sucesso') !== false) {
-        header('Location: ' . $_ENV['URL_BASE'] . 'api/machines/browse.php');
-        exit;
-    } else {
-        $error = $result['message'] ?? 'Erro ao atualizar máquina';
-        $machine = callAPI('machines/read.php', ['id' => $_POST['id']]);
-    }
-}
-
 if (!$machine) {
-    header('Location: ' . $_ENV['URL_BASE'] . 'api/machines/browse.php');
+    header('Location: ' . ADMIN_BASE_PATH . '/machines/browse.php');
     exit;
 }
 ?>
 
 <h1 class="mt-4">Editar Máquina</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Editar</li>
 </ol>

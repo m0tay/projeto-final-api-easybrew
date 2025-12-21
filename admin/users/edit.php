@@ -1,20 +1,12 @@
 <?php
-require_once __DIR__ . '/../includes/header.php';
-
-$error = '';
-$user = null;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
-    $user_id = $_POST['id'] ?? null;
-    if ($user_id) {
-        $user = callAPI('users/read.php', ['id' => $user_id]);
-        if (!isset($user['id'])) {
-            $error = 'Utilizador não encontrado';
-        }
-    }
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../config_local.php';
+    require_once __DIR__ . '/../includes/api_helper.php';
+    
     $data = [
         'id' => $_POST['id'],
         'first_name' => $_POST['first_name'],
@@ -31,24 +23,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     
     $result = callAPI('users/edit.php', $data);
     
-    if (isset($result['message']) && strpos($result['message'], 'sucesso') !== false) {
-        header('Location: ' . $_ENV['URL_BASE'] . 'api/users/browse.php');
+    if (isset($result['http_code']) && $result['http_code'] == 200) {
+        header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
         exit;
-    } else {
-        $error = $result['message'] ?? 'Erro ao atualizar utilizador';
-        $user = callAPI('users/read.php', ['id' => $_POST['id']]);
+    }
+}
+
+require_once __DIR__ . '/../includes/header.php';
+
+$error = '';
+$user = null;
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+    $error = $result['message'] ?? 'Erro ao atualizar utilizador';
+    $user = callAPI('users/read.php', ['id' => $_POST['id']]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
+    $user_id = $_POST['id'] ?? null;
+    if ($user_id) {
+        $user = callAPI('users/read.php', ['id' => $user_id]);
+        if (!isset($user['id'])) {
+            $error = 'Utilizador não encontrado';
+        }
     }
 }
 
 if (!$user) {
-    header('Location: ' . $_ENV['URL_BASE'] . 'api/users/browse.php');
+    header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
     exit;
 }
 ?>
 
 <h1 class="mt-4">Editar Utilizador</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="browse.php">Utilizadores</a></li>
     <li class="breadcrumb-item active">Editar</li>
 </ol>
