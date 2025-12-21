@@ -33,6 +33,10 @@ function callAPI($endpoint, $data = []) {
         exit;
     }
     
+    if (is_array($result)) {
+        $result['http_code'] = $httpCode;
+    }
+    
     return $result;
 }
 
