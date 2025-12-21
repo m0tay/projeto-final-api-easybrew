@@ -11,9 +11,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         'api_address' => $_POST['api_address']
     ]);
     
-    if (isset($result['message']) && strpos($result['message'], 'sucesso') !== false) {
+    if (isset($result['http_code']) && $result['http_code'] == 200) {
         $success = true;
-        header('Location: ' . $_ENV['URL_BASE'] . 'api/machines/browse.php');
+        header('Location: ' . ADMIN_BASE_PATH . '/machines/browse.php');
         exit;
     } else {
         $error = $result['message'] ?? 'Erro ao adicionar máquina';
@@ -23,7 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
 
 <h1 class="mt-4">Adicionar Máquina</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Adicionar</li>
 </ol>

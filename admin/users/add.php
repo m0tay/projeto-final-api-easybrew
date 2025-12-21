@@ -9,8 +9,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'password' => $_POST['password']
     ]);
     
-    if (isset($result['message']) && strpos($result['message'], 'sucesso') !== false) {
-        header('Location: ' . $_ENV['URL_BASE'] . 'api/users/browse.php');
+    if (isset($result['http_code']) && $result['http_code'] == 200) {
+        header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
         exit;
     } else {
         $error = $result['message'] ?? 'Erro ao criar utilizador';
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <h1 class="mt-4">Adicionar Utilizador</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="browse.php">Utilizadores</a></li>
     <li class="breadcrumb-item active">Adicionar</li>
 </ol>
