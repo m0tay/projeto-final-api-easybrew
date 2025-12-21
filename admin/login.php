@@ -1,18 +1,24 @@
 <?php
+require_once '../config.php';
+require_once '../core.php';
+
 session_start();
 
+require_once __DIR__ . '/config_local.php';
+
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
-    header('Location: ' . $_ENV['URL_BASE'] . 'admin/index.php');
+    header('Location: ' . ADMIN_BASE_PATH . '/index.php');
     exit;
 }
 
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = $_POST['email'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $email = filter_input(INPUT_POST, 'email', FILTER_UNSAFE_RAW);
+    $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
+
     
-    $ch = curl_init(__DIR__ . '/../api/auth/login.php');
+    $ch = curl_init($_ENV['URL_BASE'] . 'api/auth/login.php');
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode([
@@ -20,9 +26,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'password' => $password
     ]));
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-    
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // <-- aplicar esta linha
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // <-- aplicar esta linha
+
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlError = curl_error($ch);
     curl_close($ch);
     
     $result = json_decode($response, true);
@@ -48,11 +57,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'is_active' => $decoded->data->is_active
             ];
             
-            header('Location: ' . $_ENV['URL_BASE'] . 'admin/index.php');
+            header('Location: ' . ADMIN_BASE_PATH . '/index.php');
             exit;
         }
     } else {
-        $error = $result['message'] ?? 'Erro ao iniciar sessão';
+        $error = $result['message'] ?? 'Erro ao iniciar sEssão' . var_dump($curlError) . var_dump($_ENV['URL_BASE'] . 'api/auth/login.php');
     }
 }
 

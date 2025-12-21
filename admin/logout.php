@@ -1,5 +1,7 @@
 <?php
 session_start();
 session_destroy();
-header('Location: ' . $_ENV['URL_BASE'] . 'admin/login.php');
+
+require_once __DIR__ . '/config_local.php';
+header('Location: ' . ADMIN_BASE_PATH . '/login.php');
 exit;
