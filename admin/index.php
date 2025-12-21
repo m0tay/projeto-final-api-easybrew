@@ -38,7 +38,7 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="/admin/machines/browse.php">Ver Detalhes</a>
+                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Ver Detalhes</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -55,7 +55,7 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="/admin/machines/browse.php">Ver Detalhes</a>
+                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Ver Detalhes</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -72,7 +72,7 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="/admin/users/browse.php">Ver Detalhes</a>
+                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Ver Detalhes</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -89,7 +89,7 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="/admin/transactions/browse.php">Ver Detalhes</a>
+                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Ver Detalhes</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>

@@ -6,7 +6,7 @@ $transactions = callAPI('transactions/browse.php');
 
 <h1 class="mt-4">Transações</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item active">Transações</li>
 </ol>
 

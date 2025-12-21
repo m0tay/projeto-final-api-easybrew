@@ -15,14 +15,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 if (!$machine) {
-    header('Location: ' . $_ENV['URL_BASE'] . 'api/machines/browse.php');
+    header('Location: ' . ADMIN_BASE_PATH . '/machines/browse.php');
     exit;
 }
 ?>
 
 <h1 class="mt-4">Detalhes da Máquina</h1>
 <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin/index.php">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Ver</li>
 </ol>
