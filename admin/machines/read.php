@@ -69,11 +69,11 @@ if (!$machine) {
             </tr>
             <tr>
                 <th>Criada em</th>
-                <td><?= date('d/m/Y H:i', strtotime($machine['created_at'])) ?></td>
+                <td><?= date('d/m/Y H:i', strtotime($machine['created_at'])) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Atualizada em</th>
-                <td><?= date('d/m/Y H:i', strtotime($machine['updated_at'])) ?></td>
+                <td><?= date('d/m/Y H:i', strtotime($machine['updated_at'])) ?? "N/A" ?></td>
             </tr>
         </table>
         

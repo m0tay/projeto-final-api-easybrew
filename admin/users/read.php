@@ -37,25 +37,25 @@ if (!$user) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-user me-1"></i>
-        Utilizador #<?= htmlspecialchars($user['id']) ?>
+        Utilizador #<?= htmlspecialchars($user['id']) ?? "N/A" ?>
     </div>
     <div class="card-body">
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($user['id']) ?></td>
+                <td><?= htmlspecialchars($user['id']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Primeiro Nome</th>
-                <td><?= htmlspecialchars($user['first_name']) ?></td>
+                <td><?= htmlspecialchars($user['first_name']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Último Nome</th>
-                <td><?= htmlspecialchars($user['last_name']) ?></td>
+                <td><?= htmlspecialchars($user['last_name']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td><?= htmlspecialchars($user['email']) ?></td>
+                <td><?= htmlspecialchars($user['email']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Função</th>
@@ -69,7 +69,7 @@ if (!$user) {
             </tr>
             <tr>
                 <th>Saldo</th>
-                <td>€<?= number_format($user['balance'], 2, ',', '.') ?></td>
+                <td>€<?= number_format($user['balance'], 2, ',', '.') ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Estado</th>
@@ -87,20 +87,20 @@ if (!$user) {
             </tr>
             <tr>
                 <th>Atualizado em</th>
-                <td><?= date('d/m/Y H:i', strtotime($user['updated_at'])) ?></td>
+                <td><?= date('d/m/Y H:i', strtotime($user['updated_at'])) ?? "N/A" ?></td>
             </tr>
         </table>
         
         <div class="mt-4">
             <form method="POST" action="edit.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?? "N/A" ?>">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editar
                 </button>
             </form>
             
             <form method="POST" action="delete.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?? "N/A" ?>">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash"></i> Apagar
                 </button>
