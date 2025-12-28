@@ -9,7 +9,13 @@ define('AUTHOR', 'Douglas Lobo');
 define('ANO_LETIVO', '2025/26');
 
 require_once 'vendor/autoload.php';
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
+
+$envFile = '.env';
+if (file_exists(__DIR__ . '/.env.local')) {
+    $envFile = '.env.local';
+}
+
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__, $envFile);
 $dotenv->load();
 
 /* * * * * * * * * * * * * * *
