@@ -73,12 +73,24 @@ $user = getUser();
                             </nav>
                         </div>
                         
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseBeverages" aria-expanded="false" aria-controls="collapseBeverages">
+                            <div class="sb-nav-link-icon"><i class="fas fa-mug-hot"></i></div>
+                            Bebidas
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse" id="collapseBeverages" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php">Listar</a>
+                                <a class="nav-link" href="<?= ADMIN_BASE_PATH ?>/beverages/add.php">Adicionar</a>
+                            </nav>
+                        </div>
+                        
                         <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseTransactions" aria-expanded="false" aria-controls="collapseTransactions">
                             <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
                             Transações
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse" id="collapseTransactions" aria-labelledby="headingThree" data-bs-parent="#sidenavAccordion">
+                        <div class="collapse" id="collapseTransactions" aria-labelledby="headingFour" data-bs-parent="#sidenavAccordion">
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link" href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Listar</a>
                             </nav>
