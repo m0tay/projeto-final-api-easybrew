@@ -19,22 +19,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $beverage_id = $result['id'];
         
         if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $allowed = ['jpg', 'jpeg', 'png', 'gif'];
-            $filename = $_FILES['image']['name'];
-            $filetype = $_FILES['image']['type'];
-            $filesize = $_FILES['image']['size'];
-
-            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            $upload_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+            $upload_size = $_FILES['image']['size'];
+            $upload_tmp_name = $_FILES['image']['tmp_name'];
             
-            if (!in_array($ext, $allowed)) {
+            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+            $max_size = 2 * 1024 * 1024;
+            
+            if (!in_array($upload_extension, $allowed_extensions)) {
                 $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
-            } elseif ($filesize > 2 * 1024 * 1024) {
+            } elseif ($upload_size > $max_size) {
                 $error = 'Imagem muito grande. Máximo 2MB.';
             } else {
-                $new_filename = 'beverage_' . $beverage_id . '_' . time() . '.' . $ext;
-                $destination = BEVERAGE_PATH . $new_filename;
+                $image_filename = 'beverage_' . $beverage_id . '_' . time() . '.' . $upload_extension;
+                $image_path = BEVERAGE_PATH . $image_filename;
                 
-                if (move_uploaded_file($_FILES['image']['tmp_name'], $destination)) {
+                create_dir(BEVERAGE_PATH);
+                
+                if (move_uploaded_file($upload_tmp_name, $image_path)) {
                     $update_result = callAPI('beverages/edit.php', [
                         'id' => $beverage_id,
                         'name' => $data['name'],
@@ -43,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'preparation' => $data['preparation'],
                         'price' => $data['price'],
                         'description' => $data['description'],
-                        'image' => $new_filename,
+                        'image' => $image_filename,
                         'is_active' => 1
                     ]);
                     
