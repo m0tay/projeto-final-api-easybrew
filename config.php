@@ -72,6 +72,20 @@ define('EMAIL_FROM', 'Projeto Desenvolvimento de Software | ESAN');
 define('WEB_SERVER', 'https://esan-tesp-ds-paw.web.ua.pt');
 define('WEB_ROOT', '/tesp-ds-g24/projeto/');
 
+/* * * * * * * * * * * * * * *
+ * U P L O A D S
+ */
+define('SERVER_FILE_ROOT', '//arca.ua.pt/Hosting/esan-tesp-ds-paw.web.ua.pt' . WEB_ROOT);
+define('UPLOAD_FOLDER', 'uploads/');
+define('UPLOAD_PATH', SERVER_FILE_ROOT . UPLOAD_FOLDER);
+
+define('AVATAR_FOLDER', UPLOAD_FOLDER . 'avatar/');
+define('AVATAR_PATH', SERVER_FILE_ROOT . AVATAR_FOLDER);
+define('AVATAR_WEB_PATH', WEB_ROOT . AVATAR_FOLDER);
+define('AVATAR_DEFAULT', 'avatar.png');
+
+define('ATTACHMENTS_PATH', SERVER_FILE_ROOT . UPLOAD_FOLDER . 'attach/');
+
 /* * * * * * * * * *
  * D E B U G
  */

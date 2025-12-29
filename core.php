@@ -110,3 +110,75 @@ function is_admin()
   }
 }
 
+/**
+ * Cria um diretório se não existir
+ * @param string $path
+ * @return bool
+ */
+function create_dir($path)
+{
+  if (!file_exists($path)) {
+    return mkdir($path, 0755, true);
+  }
+  return true;
+}
+
+/**
+ * Apaga um ficheiro
+ * @param string $filepath
+ * @return bool
+ */
+function delete_file($filepath)
+{
+  if (is_file($filepath)) {
+    return unlink($filepath);
+  }
+  return false;
+}
+
+/**
+ * Apaga um diretório e todo o seu conteúdo
+ * @param string $path
+ * @return bool
+ */
+function delete_dir($path)
+{
+  if (!is_dir($path)) {
+    return false;
+  }
+  
+  $files = array_diff(scandir($path), ['.', '..']);
+  foreach ($files as $file) {
+    $filepath = $path . DIRECTORY_SEPARATOR . $file;
+    is_dir($filepath) ? delete_dir($filepath) : unlink($filepath);
+  }
+  
+  return rmdir($path);
+}
+
+/**
+ * Converte string para slug (nome de ficheiro seguro)
+ * @param string $string
+ * @return string
+ */
+function slugify($string)
+{
+  $string = preg_replace('/[^a-zA-Z0-9\-_]/', '-', $string);
+  $string = preg_replace('/-+/', '-', $string);
+  $string = trim($string, '-');
+  return strtolower($string);
+}
+
+/**
+ * Obtém o caminho web do avatar de um utilizador
+ * @param string $avatar Nome do ficheiro do avatar
+ * @return string
+ */
+function get_avatar_url($avatar)
+{
+  if (empty($avatar) || !file_exists(AVATAR_PATH . $avatar)) {
+    return AVATAR_WEB_PATH . AVATAR_DEFAULT;
+  }
+  return AVATAR_WEB_PATH . $avatar;
+}
+

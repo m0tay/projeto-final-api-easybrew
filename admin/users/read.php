@@ -40,6 +40,11 @@ if (!$user) {
         Utilizador #<?= htmlspecialchars($user['id']) ?? "N/A" ?>
     </div>
     <div class="card-body">
+        <div class="mb-3 text-center">
+            <img src="<?= get_avatar_url($user['avatar'] ?? '') ?>" 
+                 alt="Avatar" class="rounded-circle" 
+                 width="120" height="120">
+        </div>
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>

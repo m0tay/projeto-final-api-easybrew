@@ -4,6 +4,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         session_start();
     }
     require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../core.php';
     require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
@@ -21,11 +22,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
         $data['password'] = $_POST['password'];
     }
     
-    $result = callAPI('users/edit.php', $data);
+    // Processar upload de avatar
+    if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+        $upload_name = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_FILENAME));
+        $upload_extension = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+        $upload_size = $_FILES['avatar']['size'];
+        $upload_tmp_name = $_FILES['avatar']['tmp_name'];
+        
+        // Validações
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $max_size = 2 * 1024 * 1024; // 2MB
+        
+        if (!in_array($upload_extension, $allowed_extensions)) {
+            $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
+        } elseif ($upload_size > $max_size) {
+            $error = 'Imagem muito grande. Máximo 2MB.';
+        } else {
+            // Criar nome único para o ficheiro
+            $avatar_filename = 'user_' . $data['id'] . '_' . time() . '.' . $upload_extension;
+            $avatar_path = AVATAR_PATH . $avatar_filename;
+            
+            // Criar diretório se não existir
+            create_dir(AVATAR_PATH);
+            
+            // Mover ficheiro para pasta de avatares
+            if (move_uploaded_file($upload_tmp_name, $avatar_path)) {
+                $data['avatar'] = $avatar_filename;
+                
+                // Apagar avatar antigo se existir
+                $old_user = callAPI('users/read.php', ['id' => $data['id']]);
+                if (!empty($old_user['avatar']) && file_exists(AVATAR_PATH . $old_user['avatar'])) {
+                    delete_file(AVATAR_PATH . $old_user['avatar']);
+                }
+            } else {
+                $error = 'Erro ao fazer upload do avatar.';
+            }
+        }
+    }
     
-    if (isset($result['http_code']) && $result['http_code'] == 200) {
-        header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
-        exit;
+    if (!isset($error)) {
+        $result = callAPI('users/edit.php', $data);
+        
+        if (isset($result['http_code']) && $result['http_code'] == 200) {
+            header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
+            exit;
+        }
     }
 }
 
@@ -73,8 +114,22 @@ if (!$user) {
         Editar Utilizador #<?= htmlspecialchars($user['id']) ?>
     </div>
     <div class="card-body">
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+            
+            <div class="mb-4">
+                <label class="form-label">Avatar</label>
+                <div class="d-flex align-items-center">
+                    <img src="<?= get_avatar_url($user['avatar'] ?? '') ?>" 
+                         alt="Avatar" class="rounded-circle me-3" 
+                         width="80" height="80" id="avatar-preview">
+                    <div>
+                        <input type="file" class="form-control" id="avatar" name="avatar" 
+                               accept="image/jpeg,image/png,image/gif">
+                        <div class="form-text">JPG, PNG ou GIF. Máximo 2MB.</div>
+                    </div>
+                </div>
+            </div>
             
             <div class="row">
                 <div class="col-md-6">
@@ -146,5 +201,19 @@ if (!$user) {
         </form>
     </div>
 </div>
+
+<script>
+// Preview do avatar antes do upload
+document.getElementById('avatar').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatar-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
 
 <?php require_once __DIR__ . '/../includes/footer.php'; ?>
