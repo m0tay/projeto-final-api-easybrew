@@ -19,9 +19,9 @@ $response = ['message' => 'Dados inválidos'];
 if (!empty($data)) {
   $user->email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : '';
   $user->password_hash = isset($data->password) ? $data->password : '';
-  
+
   $error = '';
-  
+
   if (empty($data->email)) {
     $error .= 'Email não definido. ';
   }
@@ -29,18 +29,49 @@ if (!empty($data)) {
   if (empty($data->password)) {
     $error .= 'Password não definida. ';
   }
-  
+
   if ($error == '') {
-    if ($user->emailExists()) {
+    $email_exists = $user->emailExists();
+
+    if ($email_exists && boolval($user->email_verified)) {
       $code = 409;
-      $response = ['message' => 'Email já registado'];
+      $response = ['message' => 'Email já registado e verificado'];
     } else {
-      if ($user->add()) {
-        
+
+      $is_new_user = !$email_exists;
+
+      if ($is_new_user) {
+        $success = $user->add();
+      } else {
+        $new_token = bin2hex(random_bytes(32));
+        $new_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+        $password_hash = password_hash($user->password_hash, PASSWORD_DEFAULT);
+
+        $query = "UPDATE users SET 
+          password_hash = :password_hash,
+          email_verification_token = :token,
+          email_verification_expires = :expires
+          WHERE id = :id";
+        $stmt = $pdo->prepare($query);
+        $stmt->bindValue(':password_hash', $password_hash);
+        $stmt->bindValue(':token', $new_token);
+        $stmt->bindValue(':expires', $new_expires);
+        $stmt->bindValue(':id', $user->id);
+
+        $success = $stmt->execute();
+
+        if ($success) {
+          $user->email_verification_token = $new_token;
+          $user->email_verification_expires = $new_expires;
+        }
+      }
+
+      if ($success) {
+
         $confirmation_link = WEB_SERVER . WEB_ROOT . 'api/auth/confirm_email.php?token=' . $user->email_verification_token;
-        
+
         $mail = new PHPMailer(true);
-        
+
         try {
           $mail->CharSet = EMAIL_CHARSET;
           $mail->Encoding = EMAIL_ENCODING;
@@ -50,10 +81,10 @@ if (!empty($data)) {
           $mail->Username = EMAIL_USERNAME;
           $mail->Password = EMAIL_PASSWORD;
           $mail->Port = EMAIL_PORT;
-          
+
           $mail->setFrom(EMAIL_USERNAME, EMAIL_FROM);
           $mail->addAddress($user->email, $user->first_name . ' ' . $user->last_name);
-          
+
           $mail->isHTML(true);
           $mail->Subject = 'Confirmação de Registo - EasyBrew';
           $mail->Body = '
@@ -95,9 +126,9 @@ if (!empty($data)) {
             </html>
           ';
           $mail->AltBody = "Olá {$user->first_name},\n\nObrigado por te registares no EasyBrew.\n\nPara ativares a tua conta, acede ao seguinte link:\n{$confirmation_link}\n\nEste link é válido por 24 horas.\n\n© " . ANO_LETIVO . " EasyBrew - Universidade de Aveiro";
-          
+
           $mail->send();
-          
+
           $code = 200;
           $response = ['message' => 'Registo efetuado. Verifica o teu email para confirmar a conta.'];
         } catch (Exception $e) {
@@ -117,4 +148,3 @@ if (!empty($data)) {
 header('Content-Type: application/json; charset=UTF-8');
 http_response_code($code);
 echo json_encode($response);
-

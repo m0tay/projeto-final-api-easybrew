@@ -34,18 +34,6 @@ if ($stmt->rowCount() > 0) {
     header('Location: ' . $login_url . '?erro=erro_confirmacao');
   }
 } else {
-  // Check if token exists but is expired
-  $check_query = "SELECT * FROM users WHERE email_verification_token = :token";
-  $check_stmt = $pdo->prepare($check_query);
-  $check_stmt->bindParam(':token', $token);
-  $check_stmt->execute();
-  
-  if ($check_stmt->rowCount() > 0) {
-    // Token exists but expired - user can request resend
-    header('Location: ' . $login_url . '?erro=token_expirado&pode_reenviar=1');
-  } else {
-    // Token doesn't exist or already used
-    header('Location: ' . $login_url . '?erro=token_invalido');
-  }
+  header('Location: ' . $login_url . '?erro=token_expirado');
 }
 exit;
