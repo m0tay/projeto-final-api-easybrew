@@ -31,8 +31,11 @@ if (!empty($data)) {
       $response = ['message' => 'Credenciais inválidas'];
     } else {
       if (!boolval($user->is_active)) {
-        $code = 403; // Forbidden BE GONE, PEASANT
+        $code = 403;
         $response = ['message' => 'Conta desativada'];
+      } else if (!boolval($user->email_verified)) {
+        $code = 403;
+        $response = ['message' => 'Email não verificado. Verifica a tua caixa de entrada.'];
       } else if (password_verify($plain_password, $user->password_hash)) {
         // Criar token
         $token = array(

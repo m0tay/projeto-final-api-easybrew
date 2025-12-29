@@ -65,9 +65,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+$success = '';
+
 if (isset($_GET['erro'])) {
     if ($_GET['erro'] === 'sessao_expirada') {
         $error = 'Sessão expirada. Por favor, inicie sessão novamente.';
+    } else if ($_GET['erro'] === 'token_invalido') {
+        $error = 'Token de confirmação inválido.';
+    } else if ($_GET['erro'] === 'token_expirado') {
+        $error = 'Token de confirmação expirado. Regista-te novamente.';
+    } else if ($_GET['erro'] === 'erro_confirmacao') {
+        $error = 'Erro ao confirmar email. Tenta novamente.';
+    }
+}
+
+if (isset($_GET['sucesso'])) {
+    if ($_GET['sucesso'] === 'email_confirmado') {
+        $success = 'Email confirmado com sucesso! Já podes fazer login.';
     }
 }
 ?>
@@ -93,6 +107,9 @@ if (isset($_GET['erro'])) {
                                     <div class="card-body">
                                         <?php if ($error): ?>
                                             <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                                        <?php endif; ?>
+                                        <?php if ($success): ?>
+                                            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
                                         <?php endif; ?>
                                         <form method="POST">
                                             <div class="form-floating mb-3">
