@@ -24,7 +24,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     
     // Processar upload de avatar
     if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
-        $upload_name = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_FILENAME));
         $upload_extension = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
         $upload_size = $_FILES['avatar']['size'];
         $upload_tmp_name = $_FILES['avatar']['tmp_name'];
