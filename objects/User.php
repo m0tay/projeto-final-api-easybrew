@@ -87,8 +87,8 @@ class User implements BREAD
       $this->role = $row['role'];
       $this->balance = $row['balance'];
       $this->password_hash = $row['password_hash'];
-      $this->is_active = $row['is_active'];
-      $this->email_verified = $row['email_verified'];
+      $this->is_active = boolval($row['is_active']);
+      $this->email_verified = boolval($row['email_verified']);
       $this->email_verification_token = $row['email_verification_token'];
       $this->email_verification_expires = $row['email_verification_expires'];
     }
@@ -358,8 +358,8 @@ class User implements BREAD
       $this->password_hash = $row['password_hash'];
       $this->role = $row['role'];
       $this->balance = $row['balance'];
-      $this->is_active = $row['is_active'];
-      $this->email_verified = $row['email_verified'];
+      $this->is_active = boolval($row['is_active']);
+      $this->email_verified = boolval($row['email_verified']);
       $this->email_verification_token = $row['email_verification_token'];
       $this->email_verification_expires = $row['email_verification_expires'];
 

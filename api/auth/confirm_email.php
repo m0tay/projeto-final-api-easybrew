@@ -8,8 +8,10 @@ $user = new User($pdo);
 
 $token = isset($_GET['token']) ? filter_var($_GET['token'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 
+$login_url = WEB_SERVER . WEB_ROOT . 'admin/login.php';
+
 if (empty($token)) {
-  header('Location: ' . WEB_SERVER . WEB_ROOT . 'admin/login.php?erro=token_invalido');
+  header('Location: ' . $login_url . '?erro=token_invalido');
   exit;
 }
 
@@ -27,11 +29,11 @@ if ($stmt->rowCount() > 0) {
   $update_stmt->bindParam(':id', $user_id);
   
   if ($update_stmt->execute()) {
-    header('Location: ' . WEB_SERVER . WEB_ROOT . 'admin/login.php?sucesso=email_confirmado');
+    header('Location: ' . $login_url . '?sucesso=email_confirmado');
   } else {
-    header('Location: ' . WEB_SERVER . WEB_ROOT . 'admin/login.php?erro=erro_confirmacao');
+    header('Location: ' . $login_url . '?erro=erro_confirmacao');
   }
 } else {
-  header('Location: ' . WEB_SERVER . WEB_ROOT . 'admin/login.php?erro=token_expirado');
+  header('Location: ' . $login_url . '?erro=token_expirado');
 }
 exit;
