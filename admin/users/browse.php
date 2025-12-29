@@ -22,6 +22,7 @@ $users = callAPI('users/browse.php');
         <table id="datatablesSimple">
             <thead>
                 <tr>
+                    <th>Avatar</th>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Email</th>
@@ -35,6 +36,11 @@ $users = callAPI('users/browse.php');
                 <?php if (isset($users['records'])): ?>
                     <?php foreach ($users['records'] as $user): ?>
                         <tr>
+                            <td>
+                                <img src="<?= get_avatar_url($user['avatar'] ?? '') ?>" 
+                                     alt="Avatar" class="rounded-circle" 
+                                     width="40" height="40">
+                            </td>
                             <td><?= htmlspecialchars($user['id']) ?></td>
                             <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
                             <td><?= htmlspecialchars($user['email']) ?></td>

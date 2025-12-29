@@ -16,6 +16,7 @@ class User implements BREAD
   public $role;
   public $balance;
   public $is_active;
+  public $avatar;
 
   // Construtor regista a ligação à Base de Dados
   public function __construct($db)
@@ -85,6 +86,7 @@ class User implements BREAD
       $this->balance = $row['balance'];
       $this->password_hash = $row['password_hash'];
       $this->is_active = $row['is_active'];
+      $this->avatar = $row['avatar'] ?? null;
     }
   }
 
@@ -146,6 +148,8 @@ class User implements BREAD
 
     // if password needs to be updated
     $password_set = !empty($this->password_hash) ? ", password_hash = :password_hash" : "";
+    // if avatar needs to be updated
+    $avatar_set = !empty($this->avatar) ? ", avatar = :avatar" : "";
 
     // if no posted password, do not update the password
     $query = "UPDATE " . $this->table_name . "
@@ -154,6 +158,7 @@ class User implements BREAD
       last_name = :last_name,
       email = :email
     {$password_set}
+    {$avatar_set}
     WHERE id = :id";
 
     $stmt = $this->conn->prepare($query);
@@ -162,6 +167,7 @@ class User implements BREAD
     $this->last_name = filter_var($this->last_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
     $this->password_hash = !empty($this->password_hash) ? filter_var($this->password_hash) : '';
+    $this->avatar = !empty($this->avatar) ? filter_var($this->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 
     $stmt->bindValue(':first_name', $this->first_name);
     $stmt->bindValue(':last_name', $this->last_name);
@@ -171,6 +177,10 @@ class User implements BREAD
     if (!empty($this->password_hash)) {
       $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
       $stmt->bindValue(':password_hash', $password_hash);
+    }
+    // bind avatar if provided
+    if (!empty($this->avatar)) {
+      $stmt->bindValue(':avatar', $this->avatar);
     }
 
     $stmt->bindValue(':id', $this->id);
@@ -191,6 +201,8 @@ class User implements BREAD
 
     // if password needs to be updated
     $password_set = !empty($this->password_hash) ? ", password_hash = :password_hash" : "";
+    // if avatar needs to be updated
+    $avatar_set = !empty($this->avatar) ? ", avatar = :avatar" : "";
 
     $query = "UPDATE " . $this->table_name . "
       SET
@@ -201,6 +213,7 @@ class User implements BREAD
       balance = :balance,
       is_active = :is_active
     {$password_set}
+    {$avatar_set}
     WHERE id = :id";
 
     $stmt = $this->conn->prepare($query);
@@ -212,6 +225,7 @@ class User implements BREAD
     $this->balance = filter_var($this->balance, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION);
     $this->is_active = filter_var($this->is_active, FILTER_SANITIZE_NUMBER_INT);
     $this->password_hash = !empty($this->password_hash) ? filter_var($this->password_hash) : '';
+    $this->avatar = !empty($this->avatar) ? filter_var($this->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 
     $stmt->bindValue(':first_name', $this->first_name);
     $stmt->bindValue(':last_name', $this->last_name);
@@ -224,6 +238,10 @@ class User implements BREAD
     if (!empty($this->password_hash)) {
       $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
       $stmt->bindValue(':password_hash', $password_hash);
+    }
+    // bind avatar if provided
+    if (!empty($this->avatar)) {
+      $stmt->bindValue(':avatar', $this->avatar);
     }
 
     $stmt->bindValue(':id', $this->id);
@@ -345,6 +363,7 @@ class User implements BREAD
       $this->role = $row['role'];
       $this->balance = $row['balance'];
       $this->is_active = $row['is_active'];
+      $this->avatar = $row['avatar'] ?? null;
 
       return true;
     }

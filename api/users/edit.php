@@ -35,6 +35,7 @@ if ($jwt) {
       $user->last_name = isset($data->last_name) ? filter_var($data->last_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
       $user->email = isset($data->email) ? filter_var($data->email, FILTER_VALIDATE_EMAIL) : '';
       $user->password_hash = isset($data->password) ? $data->password : '';
+      $user->avatar = isset($data->avatar) ? filter_var($data->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
       
       // Check if admin-only fields are being updated
       $is_admin = $decoded->data->role === 'admin';
