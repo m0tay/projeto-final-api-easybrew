@@ -182,3 +182,10 @@ function get_avatar_url($avatar)
   return AVATAR_WEB_PATH . $avatar;
 }
 
+function get_beverage_image_url($image)
+{
+  if (empty($image) || !file_exists(BEVERAGE_PATH . $image)) {
+    return BEVERAGE_WEB_PATH . BEVERAGE_DEFAULT;
+  }
+  return BEVERAGE_WEB_PATH . $image;
+}
