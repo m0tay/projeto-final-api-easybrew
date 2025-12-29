@@ -57,6 +57,21 @@ $jwt_conf = [
   'alg' => 'HS256',
 ];
 
+/* * * * * * * * * * * * * * *
+ * E M A I L
+ */
+define('EMAIL_CHARSET', 'UTF-8');
+define('EMAIL_ENCODING', 'base64');
+define('EMAIL_HOST', 'smtp-servers.ua.pt');
+define('EMAIL_SMTPAUTH', true);
+define('EMAIL_USERNAME', 'esan-tesp-ds-paw@ua.pt');
+define('EMAIL_PASSWORD', '8ee83a66c46001b7ee7b3ee886bf8375');
+define('EMAIL_PORT', 25);
+define('EMAIL_FROM', 'Projeto Desenvolvimento de Software | ESAN');
+
+define('WEB_SERVER', 'https://esan-tesp-ds-paw.web.ua.pt');
+define('WEB_ROOT', '/tesp-ds-g24/projeto/');
+
 /* * * * * * * * * *
  * D E B U G
  */

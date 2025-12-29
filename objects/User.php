@@ -16,6 +16,9 @@ class User implements BREAD
   public $role;
   public $balance;
   public $is_active;
+  public $email_verified;
+  public $email_verification_token;
+  public $email_verification_expires;
 
   // Construtor regista a ligação à Base de Dados
   public function __construct($db)
@@ -84,7 +87,10 @@ class User implements BREAD
       $this->role = $row['role'];
       $this->balance = $row['balance'];
       $this->password_hash = $row['password_hash'];
-      $this->is_active = $row['is_active'];
+      $this->is_active = boolval($row['is_active']);
+      $this->email_verified = boolval($row['email_verified']);
+      $this->email_verification_token = $row['email_verification_token'];
+      $this->email_verification_expires = $row['email_verification_expires'];
     }
   }
 
@@ -104,7 +110,10 @@ class User implements BREAD
       last_name = :last_name,
       password_hash = :password_hash,
       role = 'customer',
-      balance = 0.0";
+      balance = 0.0,
+      email_verified = 0,
+      email_verification_token = :token,
+      email_verification_expires = :expires";
     // prepare the query
     $stmt = $this->conn->prepare($query);
 
@@ -128,6 +137,11 @@ class User implements BREAD
     // it will be then definitely hashed
     $password_hash = password_hash($this->password_hash, PASSWORD_DEFAULT);
     $stmt->bindValue(':password_hash', $password_hash);
+
+    $this->email_verification_token = bin2hex(random_bytes(32));
+    $this->email_verification_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
+    $stmt->bindValue(':token', $this->email_verification_token);
+    $stmt->bindValue(':expires', $this->email_verification_expires);
 
     if ($stmt->execute()) {
       $this->id = $this->conn->lastInsertId();
@@ -344,7 +358,10 @@ class User implements BREAD
       $this->password_hash = $row['password_hash'];
       $this->role = $row['role'];
       $this->balance = $row['balance'];
-      $this->is_active = $row['is_active'];
+      $this->is_active = boolval($row['is_active']);
+      $this->email_verified = boolval($row['email_verified']);
+      $this->email_verification_token = $row['email_verification_token'];
+      $this->email_verification_expires = $row['email_verification_expires'];
 
       return true;
     }
