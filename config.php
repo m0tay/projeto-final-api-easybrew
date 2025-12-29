@@ -84,6 +84,11 @@ define('AVATAR_PATH', SERVER_FILE_ROOT . AVATAR_FOLDER);
 define('AVATAR_WEB_PATH', WEB_ROOT . AVATAR_FOLDER);
 define('AVATAR_DEFAULT', 'avatar.png');
 
+define('BEVERAGE_FOLDER', UPLOAD_FOLDER . 'beverages/');
+define('BEVERAGE_PATH', SERVER_FILE_ROOT . BEVERAGE_FOLDER);
+define('BEVERAGE_WEB_PATH', WEB_ROOT . BEVERAGE_FOLDER);
+define('BEVERAGE_DEFAULT', 'beverage.png');
+
 define('ATTACHMENTS_PATH', SERVER_FILE_ROOT . UPLOAD_FOLDER . 'attach/');
 
 /* * * * * * * * * *
