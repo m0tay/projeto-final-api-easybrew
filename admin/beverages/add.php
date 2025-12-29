@@ -4,13 +4,14 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $preparation = filter_input(INPUT_POST, 'preparation', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
     $data = [
-        'name' => $_POST['name'],
-        'type' => $_POST['type'] ?? null,
-        'size' => $_POST['size'] ?? null,
-        'preparation' => isset($_POST['preparation']) ? implode(',', $_POST['preparation']) : null,
-        'price' => $_POST['price'],
-        'description' => $_POST['description'] ?? null
+        'name' => filter_input(INPUT_POST, 'name'),
+        'type' => filter_input(INPUT_POST, 'type'),
+        'size' => filter_input(INPUT_POST, 'size'),
+        'preparation' => $preparation ? implode(',', $preparation) : null,
+        'price' => filter_input(INPUT_POST, 'price', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+        'description' => filter_input(INPUT_POST, 'description')
     ];
 
     $result = callAPI('beverages/add.php', $data);

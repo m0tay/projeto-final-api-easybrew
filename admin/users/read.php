@@ -5,7 +5,7 @@ $error = '';
 $user = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $user_id = $_POST['id'] ?? null;
+    $user_id = filter_input(INPUT_POST, 'id');
     if ($user_id) {
         $user = callAPI('users/read.php', ['id' => $user_id]);
         if (!isset($user['id'])) {

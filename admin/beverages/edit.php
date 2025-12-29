@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -8,15 +8,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
+    $preparation = filter_input(INPUT_POST, 'preparation', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
     $data = [
-        'id' => $_POST['id'],
-        'name' => $_POST['name'],
-        'type' => $_POST['type'] ?? null,
-        'size' => $_POST['size'] ?? null,
-        'preparation' => isset($_POST['preparation']) ? implode(',', $_POST['preparation']) : null,
-        'price' => $_POST['price'],
-        'description' => $_POST['description'] ?? null,
-        'is_active' => $_POST['is_active']
+        'id' => filter_input(INPUT_POST, 'id'),
+        'name' => filter_input(INPUT_POST, 'name'),
+        'type' => filter_input(INPUT_POST, 'type'),
+        'size' => filter_input(INPUT_POST, 'size'),
+        'preparation' => $preparation ? implode(',', $preparation) : null,
+        'price' => filter_input(INPUT_POST, 'price', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+        'description' => filter_input(INPUT_POST, 'description'),
+        'is_active' => filter_input(INPUT_POST, 'is_active')
     ];
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -49,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
             }
         }
     } else {
-        $old_beverage = callAPI('beverages/read.php', ['id' => $_POST['id']]);
+        $old_beverage = callAPI('beverages/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
         $data['image'] = $old_beverage['image'] ?? null;
     }
     
@@ -68,11 +69,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $beverage = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     $error = $result['message'] ?? 'Erro ao atualizar bebida';
-    $beverage = callAPI('beverages/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
-    $beverage_id = $_POST['id'] ?? null;
+    $beverage = callAPI('beverages/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') === null) {
+    $beverage_id = filter_input(INPUT_POST, 'id');
     if ($beverage_id) {
         $beverage = callAPI('beverages/read.php', ['id' => $beverage_id]);
         if (!isset($beverage['id'])) {

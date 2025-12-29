@@ -6,7 +6,7 @@ require_once '../../objects/User.php';
 $pdo = connectDB($db);
 $user = new User($pdo);
 
-$token = isset($_GET['token']) ? filter_var($_GET['token'], FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
+$token = filter_input(INPUT_GET, 'token', FILTER_SANITIZE_FULL_SPECIAL_CHARS) ?? '';
 
 $login_url = WEB_SERVER . WEB_ROOT . 'admin/login.php';
 

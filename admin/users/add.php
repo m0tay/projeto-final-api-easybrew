@@ -5,8 +5,8 @@ $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = callAPI('users/add.php', [
-        'email' => $_POST['email'],
-        'password' => $_POST['password']
+        'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
+        'password' => filter_input(INPUT_POST, 'password')
     ]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {

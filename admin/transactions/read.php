@@ -5,7 +5,7 @@ $error = '';
 $transaction = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $transaction_id = $_POST['id'] ?? null;
+    $transaction_id = filter_input(INPUT_POST, 'id');
     if ($transaction_id) {
         $transaction = callAPI('transactions/read.php', ['id' => $transaction_id]);
         if (!isset($transaction['id'])) {

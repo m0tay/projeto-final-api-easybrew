@@ -14,8 +14,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = filter_input(INPUT_POST, 'email', FILTER_UNSAFE_RAW);
-    $password = filter_input(INPUT_POST, 'password', FILTER_UNSAFE_RAW);
+    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
+    $password = filter_input(INPUT_POST, 'password');
 
     
     $ch = curl_init($_ENV['URL_BASE'] . 'api/auth/login.php');
@@ -67,20 +67,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $success = '';
 
-if (isset($_GET['erro'])) {
-    if ($_GET['erro'] === 'sessao_expirada') {
+if (filter_input(INPUT_GET, 'erro') !== null) {
+    $erro = filter_input(INPUT_GET, 'erro');
+    if ($erro === 'sessao_expirada') {
         $error = 'Sessão expirada. Por favor, inicie sessão novamente.';
-    } else if ($_GET['erro'] === 'token_invalido') {
+    } else if ($erro === 'token_invalido') {
         $error = 'Token de confirmação inválido.';
-    } else if ($_GET['erro'] === 'token_expirado') {
+    } else if ($erro === 'token_expirado') {
         $error = 'Token de confirmação expirado. Regista-te novamente.';
-    } else if ($_GET['erro'] === 'erro_confirmacao') {
+    } else if ($erro === 'erro_confirmacao') {
         $error = 'Erro ao confirmar email. Tenta novamente.';
     }
 }
 
-if (isset($_GET['sucesso'])) {
-    if ($_GET['sucesso'] === 'email_confirmado') {
+if (filter_input(INPUT_GET, 'sucesso') !== null) {
+    $sucesso = filter_input(INPUT_GET, 'sucesso');
+    if ($sucesso === 'email_confirmado') {
         $success = 'Email confirmado com sucesso! Já podes fazer login.';
     }
 }

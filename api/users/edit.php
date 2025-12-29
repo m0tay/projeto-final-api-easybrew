@@ -24,7 +24,7 @@ if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
     
-    $target_user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_NUMBER_INT) : $decoded->data->id;
+    $target_user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $decoded->data->id;
     
     if ($decoded->data->id != $target_user_id && $decoded->data->role !== 'admin') {
       $code = 403;

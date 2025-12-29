@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
-    $result = callAPI('beverages/delete.php', ['id' => $_POST['id']]);
+    $result = callAPI('beverages/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
         header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');
@@ -20,11 +20,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $beverage = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     $error = $result['message'] ?? 'Erro ao apagar bebida';
-    $beverage = callAPI('beverages/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['confirm'])) {
-    $beverage_id = $_POST['id'] ?? null;
+    $beverage = callAPI('beverages/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') === null) {
+    $beverage_id = filter_input(INPUT_POST, 'id');
     if ($beverage_id) {
         $beverage = callAPI('beverages/read.php', ['id' => $beverage_id]);
         if (!isset($beverage['id'])) {

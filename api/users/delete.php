@@ -13,7 +13,7 @@ use \Firebase\JWT\Key;
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
-$user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_NUMBER_INT) : '';
+$user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 
 if ($jwt) {
   try {

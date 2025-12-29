@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -8,9 +8,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $result = callAPI('transactions/edit.php', [
-        'id' => $_POST['id'],
-        'type' => $_POST['type'],
-        'status' => $_POST['status']
+        'id' => filter_input(INPUT_POST, 'id'),
+        'type' => filter_input(INPUT_POST, 'type'),
+        'status' => filter_input(INPUT_POST, 'status')
     ]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
@@ -24,11 +24,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $transaction = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     $error = $result['message'] ?? 'Erro ao atualizar transação';
-    $transaction = callAPI('transactions/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
-    $transaction_id = $_POST['id'] ?? null;
+    $transaction = callAPI('transactions/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') === null) {
+    $transaction_id = filter_input(INPUT_POST, 'id');
     if ($transaction_id) {
         $transaction = callAPI('transactions/read.php', ['id' => $transaction_id]);
         if (!isset($transaction['id'])) {

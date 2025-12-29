@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -8,11 +8,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $result = callAPI('machines/edit.php', [
-        'id' => $_POST['id'],
-        'machine_code' => $_POST['machine_code'],
-        'location_name' => $_POST['location_name'],
-        'api_address' => $_POST['api_address'],
-        'is_active' => $_POST['is_active']
+        'id' => filter_input(INPUT_POST, 'id'),
+        'machine_code' => filter_input(INPUT_POST, 'machine_code'),
+        'location_name' => filter_input(INPUT_POST, 'location_name'),
+        'api_address' => filter_input(INPUT_POST, 'api_address'),
+        'is_active' => filter_input(INPUT_POST, 'is_active')
     ]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
@@ -26,11 +26,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $machine = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     $error = $result['message'] ?? 'Erro ao atualizar máquina';
-    $machine = callAPI('machines/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
-    $machine_id = $_POST['id'] ?? null;
+    $machine = callAPI('machines/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') === null) {
+    $machine_id = filter_input(INPUT_POST, 'id');
     if ($machine_id) {
         $machine = callAPI('machines/read.php', ['id' => $machine_id]);
         if (!isset($machine['id'])) {

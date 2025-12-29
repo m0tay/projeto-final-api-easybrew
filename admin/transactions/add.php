@@ -17,14 +17,14 @@ if (isset($machinesData['records'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = callAPI('transactions/add.php', [
-        'user_id' => $_POST['user_id'],
-        'machine_id' => $_POST['machine_id'],
-        'beverage_id' => $_POST['beverage_id'],
-        'beverage_name' => $_POST['beverage_name'],
-        'preparation_chosen' => $_POST['preparation_chosen'],
-        'amount' => $_POST['amount'],
-        'type' => $_POST['type'],
-        'status' => $_POST['status']
+        'user_id' => filter_input(INPUT_POST, 'user_id'),
+        'machine_id' => filter_input(INPUT_POST, 'machine_id'),
+        'beverage_id' => filter_input(INPUT_POST, 'beverage_id'),
+        'beverage_name' => filter_input(INPUT_POST, 'beverage_name'),
+        'preparation_chosen' => filter_input(INPUT_POST, 'preparation_chosen'),
+        'amount' => filter_input(INPUT_POST, 'amount', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+        'type' => filter_input(INPUT_POST, 'type'),
+        'status' => filter_input(INPUT_POST, 'status')
     ]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {

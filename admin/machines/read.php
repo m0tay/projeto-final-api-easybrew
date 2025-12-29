@@ -5,7 +5,7 @@ $error = '';
 $machine = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $machine_id = $_POST['id'] ?? null;
+    $machine_id = filter_input(INPUT_POST, 'id');
     if ($machine_id) {
         $machine = callAPI('machines/read.php', ['id' => $machine_id]);
         if (!isset($machine['id'])) {

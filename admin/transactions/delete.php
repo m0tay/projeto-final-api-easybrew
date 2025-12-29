@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
-    $result = callAPI('transactions/delete.php', ['id' => $_POST['id']]);
+    $result = callAPI('transactions/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
         header('Location: ' . ADMIN_BASE_PATH . '/transactions/browse.php');
@@ -20,11 +20,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $transaction = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     $error = $result['message'] ?? 'Erro ao apagar transação';
-    $transaction = callAPI('transactions/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['confirm'])) {
-    $transaction_id = $_POST['id'] ?? null;
+    $transaction = callAPI('transactions/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') === null) {
+    $transaction_id = filter_input(INPUT_POST, 'id');
     if ($transaction_id) {
         $transaction = callAPI('transactions/read.php', ['id' => $transaction_id]);
         if (!isset($transaction['id'])) {

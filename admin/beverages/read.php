@@ -5,7 +5,7 @@ $error = '';
 $beverage = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $beverage_id = $_POST['id'] ?? null;
+    $beverage_id = filter_input(INPUT_POST, 'id');
     if ($beverage_id) {
         $beverage = callAPI('beverages/read.php', ['id' => $beverage_id]);
         if (!isset($beverage['id'])) {

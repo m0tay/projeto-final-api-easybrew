@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
     require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
-    $result = callAPI('machines/delete.php', ['id' => $_POST['id']]);
+    $result = callAPI('machines/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
         header('Location: ' . ADMIN_BASE_PATH . '/machines/browse.php');
@@ -20,11 +20,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $machine = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') !== null) {
     $error = $result['message'] ?? 'Erro ao apagar máquina';
-    $machine = callAPI('machines/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['confirm'])) {
-    $machine_id = $_POST['id'] ?? null;
+    $machine = callAPI('machines/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm') === null) {
+    $machine_id = filter_input(INPUT_POST, 'id');
     if ($machine_id) {
         $machine = callAPI('machines/read.php', ['id' => $machine_id]);
         if (!isset($machine['id'])) {

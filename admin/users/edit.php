@@ -1,5 +1,5 @@
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
@@ -9,17 +9,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $data = [
-        'id' => $_POST['id'],
-        'first_name' => $_POST['first_name'],
-        'last_name' => $_POST['last_name'],
-        'email' => $_POST['email'],
-        'role' => $_POST['role'],
-        'balance' => $_POST['balance'],
-        'is_active' => $_POST['is_active']
+        'id' => filter_input(INPUT_POST, 'id'),
+        'first_name' => filter_input(INPUT_POST, 'first_name'),
+        'last_name' => filter_input(INPUT_POST, 'last_name'),
+        'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
+        'role' => filter_input(INPUT_POST, 'role'),
+        'balance' => filter_input(INPUT_POST, 'balance', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
+        'is_active' => filter_input(INPUT_POST, 'is_active')
     ];
     
-    if (!empty($_POST['password'])) {
-        $data['password'] = $_POST['password'];
+    $password = filter_input(INPUT_POST, 'password');
+    if (!empty($password)) {
+        $data['password'] = $password;
     }
     
     // Processar upload de avatar
@@ -74,11 +75,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $user = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     $error = $result['message'] ?? 'Erro ao atualizar utilizador';
-    $user = callAPI('users/read.php', ['id' => $_POST['id']]);
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
-    $user_id = $_POST['id'] ?? null;
+    $user = callAPI('users/read.php', ['id' => filter_input(INPUT_POST, 'id')]);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') === null) {
+    $user_id = filter_input(INPUT_POST, 'id');
     if ($user_id) {
         $user = callAPI('users/read.php', ['id' => $user_id]);
         if (!isset($user['id'])) {

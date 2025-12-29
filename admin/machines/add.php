@@ -4,11 +4,11 @@ require_once __DIR__ . '/../includes/header.php';
 $error = '';
 $success = false;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['submit'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     $result = callAPI('machines/add.php', [
-        'machine_code' => $_POST['machine_code'],
-        'location_name' => $_POST['location_name'],
-        'api_address' => $_POST['api_address']
+        'machine_code' => filter_input(INPUT_POST, 'machine_code'),
+        'location_name' => filter_input(INPUT_POST, 'location_name'),
+        'api_address' => filter_input(INPUT_POST, 'api_address')
     ]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
