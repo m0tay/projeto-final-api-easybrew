@@ -68,6 +68,10 @@ class Machine implements BREAD
 
     $stmt = $this->conn->prepare($query);
 
+    $this->machine_code = filter_var($this->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->location_name = filter_var($this->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $this->api_address = filter_var($this->api_address, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
     $stmt->bindValue(':machine_code', $this->machine_code);
     $stmt->bindValue(':location_name', $this->location_name);
     $stmt->bindValue(':api_address', $this->api_address);

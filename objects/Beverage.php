@@ -23,32 +23,13 @@ class Beverage implements BREAD
 
   public function browse()
   {
-    $query = "SELECT * FROM " . $this->table_name  . " ORDER BY name ASC";
+    $query = "SELECT * FROM " . $this->table_name . " ORDER BY name ASC";
 
     $stmt = $this->conn->prepare($query);
 
     $stmt->execute();
 
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    $beverages = array();
-
-    foreach ($rows as $row) {
-      $beverage = new Beverage($this->conn);
-      $beverage->id = $row['id'];
-      $beverage->name = $row['name'];
-      $beverage->type = $row['type'];
-      $beverage->size = $row['size'];
-      $beverage->preparation = $row['preparation'];
-      $beverage->description = $row['description'];
-      $beverage->image = $row['image'];
-      $beverage->price = $row['price'];
-      $beverage->is_active = $row['is_active'];
-
-      array_push($beverages, $beverage);
-    }
-
-    return $beverages;
+    return $stmt;
   }
 
   public function read()
@@ -57,7 +38,7 @@ class Beverage implements BREAD
 
     $stmt = $this->conn->prepare($query);
 
-    $stmt->bindValue(':id', filter_var($this->id, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     $stmt->execute();
 
@@ -89,13 +70,13 @@ class Beverage implements BREAD
 
     $stmt = $this->conn->prepare($query);
 
-    $stmt->bindValue(':name', filter_var($this->name, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':type', filter_var($this->type, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':size', filter_var($this->size, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':preparation', filter_var($this->preparation, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':name', filter_var($this->name, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':type', filter_var($this->type, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':size', filter_var($this->size, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':preparation', filter_var($this->preparation, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':price', filter_var($this->price, FILTER_VALIDATE_FLOAT));
-    $stmt->bindValue(':description', filter_var($this->description, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':image', filter_var($this->image, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':description', filter_var($this->description, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':image', filter_var($this->image, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
 
@@ -121,15 +102,15 @@ class Beverage implements BREAD
 
     $stmt = $this->conn->prepare($query);
 
-    $stmt->bindValue(':name', filter_var($this->name, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':type', filter_var($this->type, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':size', filter_var($this->size, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':preparation', filter_var($this->preparation, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':name', filter_var($this->name, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':type', filter_var($this->type, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':size', filter_var($this->size, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':preparation', filter_var($this->preparation, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':price', filter_var($this->price, FILTER_VALIDATE_FLOAT));
-    $stmt->bindValue(':description', filter_var($this->description, FILTER_UNSAFE_RAW));
-    $stmt->bindValue(':image', filter_var($this->image, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':description', filter_var($this->description, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':image', filter_var($this->image, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':is_active', filter_var($this->is_active, FILTER_VALIDATE_BOOLEAN));
-    $stmt->bindValue(':id', filter_var($this->id, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
       return true;
@@ -144,7 +125,7 @@ class Beverage implements BREAD
 
     $stmt = $this->conn->prepare($query);
 
-    $stmt->bindValue(':id', filter_var($this->id, FILTER_UNSAFE_RAW));
+    $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
       return true;
@@ -156,13 +137,5 @@ class Beverage implements BREAD
   public function search()
   {
     throw new \Exception('Not implemented');
-  }
-
-  public function make()
-  {
-    if (!$this->is_active) {
-      throw new \Exception('Bebida indisponível');
-    }
-    return 'Bebida preparada com sucesso';
   }
 }

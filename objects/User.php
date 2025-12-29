@@ -92,6 +92,7 @@ class User implements BREAD
       $this->email_verified = boolval($row['email_verified']);
       $this->email_verification_token = $row['email_verification_token'];
       $this->email_verification_expires = $row['email_verification_expires'];
+      $this->avatar = $row['avatar'] ?? null;
     }
   }
 
@@ -379,6 +380,7 @@ class User implements BREAD
       $this->email_verified = boolval($row['email_verified']);
       $this->email_verification_token = $row['email_verification_token'];
       $this->email_verification_expires = $row['email_verification_expires'];
+      $this->avatar = $row['avatar'] ?? null;
 
       return true;
     }

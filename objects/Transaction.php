@@ -81,6 +81,7 @@ class Transaction implements BREAD
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
 
     if ($row) {
+      $this->id = $row['id'];
       $this->user_id = $row['user_id'];
       $this->machine_id = $row['machine_id'];
       $this->beverage_id = $row['beverage_id'];
@@ -90,7 +91,10 @@ class Transaction implements BREAD
       $this->type = $row['type'];
       $this->status = $row['status'];
       $this->created_at = $row['created_at'];
+      return true;
     }
+    
+    return false;
   }
   public function add()
   {
