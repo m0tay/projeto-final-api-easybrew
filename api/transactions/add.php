@@ -35,41 +35,57 @@ if ($jwt) {
         $response = ['message' => 'Acesso negado: Não pode criar transações para outros utilizadores'];
       } else {
         $error = '';
-        
-        if (empty($transaction->beverage_id)) {
-          $error .= 'ID da bebida não fornecido. ';
-        }
-        if (empty($transaction->beverage_name)) {
-          $error .= 'Nome da bebida não fornecido. ';
-        }
+
         if ($transaction->amount <= 0) {
           $error .= 'Valor inválido. ';
         }
+
         if (!in_array($transaction->type, ['purchase', 'deposit', 'refund'])) {
           $error .= 'Tipo de transação inválido. ';
         }
+
         if (!in_array($transaction->status, ['completed', 'failed', 'refunded'])) {
           $error .= 'Status inválido. ';
         }
-        if ($transaction->preparation_chosen && !in_array($transaction->preparation_chosen, ['hot', 'warm', 'iced'])) {
-          $error .= 'Preparação inválida. ';
+
+        if ($transaction->type === 'purchase') {
+          if (empty($transaction->beverage_id)) {
+            $error .= 'ID da bebida não fornecido. ';
+          }
+          if (empty($transaction->beverage_name)) {
+            $error .= 'Nome da bebida não fornecido. ';
+          }
+          if ($transaction->preparation_chosen && !in_array($transaction->preparation_chosen, ['hot', 'warm', 'iced'])) {
+            $error .= 'Preparação inválida. ';
+          }
+        }
+
+        if ($transaction->type === 'deposit') {
+          if (empty($transaction->beverage_id)) {
+            $transaction->beverage_id = '0';
+          }
+          if (empty($transaction->beverage_name)) {
+            $transaction->beverage_name = 'Deposit';
+          }
+          $transaction->machine_id = null;
+          $transaction->preparation_chosen = null;
         }
 
         if ($error == '') {
           $pdo->beginTransaction();
-          
+
           try {
             if ($transaction->type === 'purchase' && $transaction->status === 'completed') {
               $user->id = $transaction->user_id;
               $user->read();
-              
+
               if ($user->balance < $transaction->amount) {
                 $pdo->rollBack();
                 $code = 400;
                 $response = ['message' => 'Saldo insuficiente'];
               } else {
                 $user->deductBalance($transaction->amount);
-                
+
                 if ($transaction->add()) {
                   $pdo->commit();
                   $code = 201;
@@ -84,11 +100,11 @@ if ($jwt) {
               $user->id = $transaction->user_id;
               $user->read();
               $user->addBalance($transaction->amount);
-              
+
               if ($transaction->add()) {
                 $pdo->commit();
-                $code = 201;
-                $response = ['message' => 'Depósito criado com sucesso', 'id' => $transaction->id];
+                $code = 200;
+                $response = ['message' => 'Depósito criado com sucesso'];
               } else {
                 $pdo->rollBack();
                 $code = 503;
@@ -131,3 +147,4 @@ if ($jwt) {
 header('Content-Type: application/json; charset=UTF-8');
 http_response_code($code);
 echo json_encode($response);
+die();
