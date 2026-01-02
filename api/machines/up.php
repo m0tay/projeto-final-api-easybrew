@@ -52,7 +52,7 @@ if ($jwt) {
         curl_close($ch);
 
         $end_time = microtime(true);
-        $response_time = round(($end_time - $start_time) * 1000, 2); // milliseconds
+        $response_time = round(($end_time - $start_time) * 1000, 2);
 
         if ($httpCode === 200 && !$curl_error) {
           $code = 200;

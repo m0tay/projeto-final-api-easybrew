@@ -43,6 +43,7 @@ if (!empty($data)) {
       if ($is_new_user) {
         $success = $user->add();
       } else {
+        // reenviar email de verificação
         $new_token = bin2hex(random_bytes(32));
         $new_expires = date('Y-m-d H:i:s', strtotime('+24 hours'));
         $password_hash = password_hash($user->password_hash, PASSWORD_DEFAULT);

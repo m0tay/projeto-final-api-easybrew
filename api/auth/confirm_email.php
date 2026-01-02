@@ -23,7 +23,7 @@ $stmt->execute();
 if ($stmt->rowCount() > 0) {
   $row = $stmt->fetch(PDO::FETCH_ASSOC);
   $user_id = $row['id'];
-  
+
   $update_query = "UPDATE users SET email_verified = 1, email_verification_token = NULL, email_verification_expires = NULL, is_active = 1 WHERE id = :id";
   $update_stmt = $pdo->prepare($update_query);
   $update_stmt->bindParam(':id', $user_id);

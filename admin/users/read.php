@@ -79,7 +79,7 @@ if (!$user) {
             <tr>
                 <th>Estado</th>
                 <td>
-                    <?php if ($user['is_active']): ?>
+                    <?php if (boolval($user['is_active'])): ?>
                         <span class="badge bg-success">Ativo</span>
                     <?php else: ?>
                         <span class="badge bg-secondary">Inativo</span>

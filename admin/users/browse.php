@@ -53,7 +53,7 @@ $users = callAPI('users/browse.php');
                             </td>
                             <td>€<?= number_format($user['balance'], 2, ',', '.') ?></td>
                             <td>
-                                <?php if ($user['is_active']): ?>
+                                <?php if (boolval($user['is_active'])): ?>
                                     <span class="badge bg-success">Ativo</span>
                                 <?php else: ?>
                                     <span class="badge bg-secondary">Inativo</span>

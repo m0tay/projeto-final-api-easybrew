@@ -29,7 +29,6 @@ if ($jwt) {
           $code = 200;
           $records = [];
           while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            // Exclude password_hash from response
             unset($row['password_hash']);
             $records[] = $row;
           }

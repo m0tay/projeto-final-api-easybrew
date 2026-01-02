@@ -42,7 +42,7 @@ $machines = $result['records'] ?? [];
                     <td><?= htmlspecialchars($m['location_name']) ?></td>
                     <td><?= htmlspecialchars($m['api_address']) ?></td>
                     <td>
-                        <?php if ($m['is_active']): ?>
+                        <?php if (boolval($m['is_active'])): ?>
                             <span class="badge bg-success">Ativa</span>
                         <?php else: ?>
                             <span class="badge bg-danger">Inativa</span>

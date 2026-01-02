@@ -108,7 +108,7 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
             <tr>
                 <th>Estado</th>
                 <td>
-                    <?php if ($beverage['is_active']): ?>
+                    <?php if (boolval($beverage['is_active'])): ?>
                         <span class="badge bg-success">Ativa</span>
                     <?php else: ?>
                         <span class="badge bg-secondary">Inativa</span>

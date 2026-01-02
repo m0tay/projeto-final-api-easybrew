@@ -2,7 +2,6 @@
 
 /* * * * * * * * * * * * * * *
  * C O N F I G U R A Ç Ã O
- * 
  */
 // Autor
 define('AUTHOR', 'Douglas Lobo');
@@ -21,7 +20,6 @@ $dotenv->load();
 /* * * * * * * * * * * * * * *
  * B A S E   D E   D A D O S
  */
-# Database credentials from .env
 $guru = $_ENV['GURU'];
 $dsg_dbo = [
   'host' => $_ENV['DB_HOST'],
@@ -41,7 +39,6 @@ $dsg_web = [
 ];
 
 /** @var Array $db['host','port','charset','dbname','username','password'] */
-# Descomentar utilizador DBO ou WEB
 $db = $dsg_dbo;
 /* $db = $dsg_web; */
 

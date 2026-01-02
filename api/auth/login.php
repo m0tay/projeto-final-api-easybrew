@@ -37,7 +37,6 @@ if (!empty($data)) {
         $code = 403;
         $response = ['message' => 'Email não verificado. Verifica a tua caixa de entrada.'];
       } else if (password_verify($plain_password, $user->password_hash)) {
-        // Criar token
         $token = array(
           'iss' => $jwt_conf['iss'],
           'jti' => $jwt_conf['jti'],
@@ -54,7 +53,6 @@ if (!empty($data)) {
             'is_active' => $user->is_active
           )
         );
-        // Criar JWT
         $jwt = JWT::encode($token, $jwt_conf['key'], $jwt_conf['alg']);
         $code = 200;
         $response = ['message' => 'Autenticado com sucesso', 'jwt' => $jwt];

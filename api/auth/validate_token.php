@@ -17,11 +17,8 @@ $jwt = isset($data->jwt) ? $data->jwt : '';
 
 if ($jwt) {
   try {
-    // Decode do JWT
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
-    // Sucesso na operação - 200 OK
     $code = 200;
-    // Enviar Resposta
     $response = [
       'message' => 'Acesso autorizado',
       'data' => $decoded->data,

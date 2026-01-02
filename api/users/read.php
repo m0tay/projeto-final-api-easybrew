@@ -38,11 +38,10 @@ if ($jwt) {
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
             'role' => $user->role,
-            'balance' => $user->balance,
-            'is_active' => $user->is_active
-          ];
-          // Note: password_hash is NOT included in response
-        } else {
+          'balance' => $user->balance,
+          'is_active' => $user->is_active
+        ];
+      } else {
           $code = 404;
           $response = ['message' => 'Utilizador não encontrado'];
         }

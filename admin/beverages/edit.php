@@ -194,8 +194,8 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
             <div class="mb-3">
                 <label for="is_active" class="form-label">Estado *</label>
                 <select class="form-select" id="is_active" name="is_active" required>
-                    <option value="1" <?= $beverage['is_active'] ? 'selected' : '' ?>>Ativa</option>
-                    <option value="0" <?= !$beverage['is_active'] ? 'selected' : '' ?>>Inativa</option>
+                    <option value="1" <?= boolval($beverage['is_active']) ? 'selected' : '' ?>>Ativa</option>
+                    <option value="0" <?= !boolval($beverage['is_active']) ? 'selected' : '' ?>>Inativa</option>
                 </select>
             </div>
             

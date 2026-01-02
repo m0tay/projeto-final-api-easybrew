@@ -84,7 +84,7 @@ if (!$machine) {
             <tr>
                 <th>Estado</th>
                 <td>
-                    <?php if ($machine['is_active']): ?>
+                    <?php if (boolval($machine['is_active'])): ?>
                         <span class="badge bg-success">Ativa</span>
                     <?php else: ?>
                         <span class="badge bg-secondary">Inativa</span>

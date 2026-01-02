@@ -86,8 +86,8 @@ if (!$machine) {
             <div class="mb-3">
                 <label for="is_active" class="form-label">Estado *</label>
                 <select class="form-select" id="is_active" name="is_active" required>
-                    <option value="1" <?= $machine['is_active'] ? 'selected' : '' ?>>Ativa</option>
-                    <option value="0" <?= !$machine['is_active'] ? 'selected' : '' ?>>Inativa</option>
+                    <option value="1" <?= boolval($machine['is_active']) ? 'selected' : '' ?>>Ativa</option>
+                    <option value="0" <?= !boolval($machine['is_active']) ? 'selected' : '' ?>>Inativa</option>
                 </select>
             </div>
             <div class="mt-4">

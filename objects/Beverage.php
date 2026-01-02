@@ -3,9 +3,9 @@ include_once 'BREAD.php';
 
 class Beverage implements BREAD
 {
-
   private $conn;
   private $table_name = 'beverages';
+  
   public $id;
   public $name;
   public $type;
@@ -24,22 +24,16 @@ class Beverage implements BREAD
   public function browse()
   {
     $query = "SELECT * FROM " . $this->table_name . " ORDER BY name ASC";
-
     $stmt = $this->conn->prepare($query);
-
     $stmt->execute();
-
     return $stmt;
   }
 
   public function read()
   {
     $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-
     $stmt = $this->conn->prepare($query);
-
     $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-
     $stmt->execute();
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -56,7 +50,7 @@ class Beverage implements BREAD
     $this->description = $row['description'];
     $this->image = $row['image'];
     $this->price = $row['price'];
-    $this->is_active = $row['is_active'];
+    $this->is_active = boolval($row['is_active']);
     
     return true;
   }
@@ -79,7 +73,6 @@ class Beverage implements BREAD
     $stmt->bindValue(':image', filter_var($this->image, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
-
       $this->id = $this->conn->lastInsertId();
       return true;
     }
@@ -122,9 +115,7 @@ class Beverage implements BREAD
   public function delete()
   {
     $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
-
     $stmt = $this->conn->prepare($query);
-
     $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {

@@ -23,7 +23,6 @@ if ($jwt) {
       $response = ['message' => 'Acesso negado: Permissões insuficientes'];
     } else {
       if (!empty($data)) {
-        // Validar dados
         $user->password_hash = isset($data->password) ? filter_var($data->password, FILTER_UNSAFE_RAW) : '';
         $user->email = isset($data->email) ? filter_var($data->email, FILTER_SANITIZE_EMAIL) : '';
 
@@ -38,23 +37,18 @@ if ($jwt) {
           $error .= 'Email já registado. ';
         }
         if ($error == '') {
-          // Criar Utilizador
           if ($user->add()) {
-            // Sucesso na criação - 201 created
             $code = 201;
             $response = ['message' => 'Utilizador criado com sucesso', 'id' => $user->id];
           } else {
-            // Erros no pedido - 503 service unavailable
             $code = 503;
             $response = ['message' => 'Erro ao criar utilizador'];
           }
         } else {
-          // Erros no pedido - 400 bad request
           $code = 400;
           $response = ['message' => $error];
         }
       } else {
-        // Erros no pedido - 400 bad request
         $code = 400;
         $response = ['message' => 'Pedido sem informação'];
       }

@@ -6,7 +6,7 @@ $users_result = callAPI('users/browse.php');
 $transactions_result = callAPI('transactions/browse.php');
 
 $total_machines = count($machines_result['records'] ?? []);
-$active_machines = count(array_filter($machines_result['records'] ?? [], fn($m) => $m['is_active']));
+$active_machines = count(array_filter($machines_result['records'] ?? [], fn($m) => boolval($m['is_active'])));
 $total_users = count($users_result['records'] ?? []);
 $total_transactions = count($transactions_result['records'] ?? []);
 

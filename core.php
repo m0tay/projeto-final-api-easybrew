@@ -1,7 +1,6 @@
 <?php
 
 /**
- * Cria uma ligação a uma base de dados e devolve um objeto PDO com a ligação
  * @param Array $db
  * @return \PDO
  */
@@ -9,29 +8,27 @@ function connectDB($db)
 {
   try {
     $pdo = new PDO(
-      'mysql:host=' . $db['host'] . '; ' . // string de ligação
-        'port=' . $db['port'] . ';' . // string de ligação
-        'charset=' . $db['charset'] . ';' . // string de ligação
-        'dbname=' . $db['dbname'] . ';', // string de ligação
-      $db['username'], // username
-      $db['password']                         // password
+      'mysql:host=' . $db['host'] . '; ' .
+        'port=' . $db['port'] . ';' .
+        'charset=' . $db['charset'] . ';' .
+        'dbname=' . $db['dbname'] . ';',
+      $db['username'],
+      $db['password']
     );
   } catch (PDOException $e) {
     die('Erro ao ligar ao servidor ' . $e->getMessage());
   }
-  // Definir array associativo como default para fetch()
+  
   $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-  // Definir lançamento de exceção para erros PDO
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+  
   return $pdo;
 }
 
 
 /**
- * Verifica se o modo DEBUG está definido e ativo e escreve na consola do browser
  * @param mixed $info
- * @param sting $type [log, error, info]
+ * @param string $type
  * @return bool
  */
 function debug($info = '', $type = 'log')
@@ -44,9 +41,7 @@ function debug($info = '', $type = 'log')
 }
 
 /**
- * Verifica se o modo DEBUG está definido e ativo e acrescenta $info ao array $_DEBUG
- * @global array $_DEBUG
- * @param array $info array("key"=>"value")
+ * @param array $info
  * @return bool
  */
 function debug_array($info = '')
@@ -60,8 +55,6 @@ function debug_array($info = '')
 }
 
 /**
- * Obtém módulo a partir do PATHINFO e valida
- * Devolve false caso não possua módulo ou o mesmo não seja válido
  * @return mixed
  */
 function get_path_module()
@@ -79,8 +72,6 @@ function get_path_module()
 }
 
 /**
- * Obtém id a partir do PATHINFO e valida
- * Devolve null caso não possua id ou id válido
  * @return mixed
  */
 function get_path_id()
@@ -89,29 +80,24 @@ function get_path_id()
   if (empty($pathinfo)) {
     return null;
   }
+  
   $patharray = explode("/", $pathinfo);
   if (!empty($patharray) && isset($patharray[2]) && filter_var($patharray[2], FILTER_VALIDATE_INT)) {
     return (int)$patharray[2];
-  } else {
-    return null;
   }
+  
+  return null;
 }
 
 /**
- * Verifica se o utilizador autenticado é admin
  * @return boolean
  */
 function is_admin()
 {
-  if (isset($_SESSION['email']) && $_SESSION['profile'] == 'admin') {
-    return true;
-  } else {
-    return false;
-  }
+  return (isset($_SESSION['email']) && $_SESSION['profile'] == 'admin');
 }
 
 /**
- * Cria um diretório se não existir
  * @param string $path
  * @return bool
  */
@@ -124,7 +110,6 @@ function create_dir($path)
 }
 
 /**
- * Apaga um ficheiro
  * @param string $filepath
  * @return bool
  */
@@ -137,7 +122,6 @@ function delete_file($filepath)
 }
 
 /**
- * Apaga um diretório e todo o seu conteúdo
  * @param string $path
  * @return bool
  */

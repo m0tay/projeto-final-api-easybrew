@@ -23,13 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         $data['password'] = $password;
     }
     
-    // Processar upload de avatar
     if (isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
         $upload_extension = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
         $upload_size = $_FILES['avatar']['size'];
         $upload_tmp_name = $_FILES['avatar']['tmp_name'];
         
-        // Validações
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         $max_size = 2 * 1024 * 1024; // 2MB
         
@@ -38,18 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         } elseif ($upload_size > $max_size) {
             $error = 'Imagem muito grande. Máximo 2MB.';
         } else {
-            // Criar nome único para o ficheiro
             $avatar_filename = 'user_' . $data['id'] . '_' . time() . '.' . $upload_extension;
             $avatar_path = AVATAR_PATH . $avatar_filename;
             
-            // Criar diretório se não existir
             create_dir(AVATAR_PATH);
             
-            // Mover ficheiro para pasta de avatares
             if (move_uploaded_file($upload_tmp_name, $avatar_path)) {
                 $data['avatar'] = $avatar_filename;
                 
-                // Apagar avatar antigo se existir
                 $old_user = callAPI('users/read.php', ['id' => $data['id']]);
                 if (!empty($old_user['avatar']) && file_exists(AVATAR_PATH . $old_user['avatar'])) {
                     delete_file(AVATAR_PATH . $old_user['avatar']);
@@ -183,8 +177,8 @@ if (!$user) {
                     <div class="mb-3">
                         <label for="is_active" class="form-label">Estado *</label>
                         <select class="form-select" id="is_active" name="is_active" required>
-                            <option value="1" <?= $user['is_active'] ? 'selected' : '' ?>>Ativo</option>
-                            <option value="0" <?= !$user['is_active'] ? 'selected' : '' ?>>Inativo</option>
+                            <option value="1" <?= boolval($user['is_active']) ? 'selected' : '' ?>>Ativo</option>
+                            <option value="0" <?= !boolval($user['is_active']) ? 'selected' : '' ?>>Inativo</option>
                         </select>
                     </div>
                 </div>
@@ -203,7 +197,6 @@ if (!$user) {
 </div>
 
 <script>
-// Preview do avatar antes do upload
 document.getElementById('avatar').addEventListener('change', function(e) {
     const file = e.target.files[0];
     if (file) {

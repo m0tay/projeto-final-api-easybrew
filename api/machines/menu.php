@@ -25,10 +25,6 @@ if ($jwt) {
     } else {
       $machine->id = $machine_id;
 
-      /* var_dump($data); */
-      /* var_dump($machine); */
-      /* die(); */
-
       if (!$machine->read()) {
         $code = 404;
         $response = ['message' => 'Máquina não encontrada'];
@@ -45,8 +41,8 @@ if ($jwt) {
           curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
           curl_setopt($ch, CURLOPT_TIMEOUT, 5);
           curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json; Host: ' . $host ]);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0); // <-- aplicar esta linha
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // <-- aplicar esta linha
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
           $menu_response = curl_exec($ch);
           $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);

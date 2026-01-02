@@ -3,18 +3,15 @@ include_once 'BREAD.php';
 
 class Machine implements BREAD
 {
-
   private $conn;
   private $table_name = 'machines';
+  
   public $id;
   public $machine_code;
   public $location_name;
   public $api_address;
   public $is_active;
 
-  /**
-   * @param mixed $db
-   */
   public function __construct($db)
   {
     $this->conn = $db;
@@ -22,23 +19,15 @@ class Machine implements BREAD
 
   public function browse()
   {
-    $query = "SELECT
-      *
-      FROM
-      " . $this->table_name . "
-      ORDER BY
-      machine_code ASC";
-
+    $query = "SELECT * FROM " . $this->table_name . " ORDER BY machine_code ASC";
     $stmt = $this->conn->prepare($query);
-
     $stmt->execute();
-
     return $stmt;
   }
+
   public function read()
   {
     $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
-
     $stmt = $this->conn->prepare($query);
     $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->execute();
@@ -50,17 +39,16 @@ class Machine implements BREAD
       $this->machine_code = $row['machine_code'];
       $this->location_name = $row['location_name'];
       $this->api_address = $row['api_address'];
-      $this->is_active = $row['is_active'];
-
+      $this->is_active = boolval($row['is_active']);
       return true;
     }
 
     return false;
   }
+
   public function add()
   {
-    $query = "INSERT INTO
-      " . $this->table_name . "
+    $query = "INSERT INTO " . $this->table_name . "
       SET
       machine_code = :machine_code,
       location_name = :location_name,
@@ -83,16 +71,16 @@ class Machine implements BREAD
 
     return false;
   }
+
   public function edit()
   {
-    $query = "UPDATE
-      " . $this->table_name . "
+    $query = "UPDATE " . $this->table_name . "
       SET
       machine_code = :machine_code,
       location_name = :location_name,
       api_address = :api_address,
       is_active = :is_active
-      WHERE id = :id ";
+      WHERE id = :id";
 
     $stmt = $this->conn->prepare($query);
 
@@ -112,15 +100,11 @@ class Machine implements BREAD
 
     return false;
   }
+
   public function delete()
   {
-    $query = "DELETE
-      FROM
-      " . $this->table_name . "
-      WHERE id = :id";
-
+    $query = "DELETE FROM " . $this->table_name . " WHERE id = :id";
     $stmt = $this->conn->prepare($query);
-
     $stmt->bindValue(':id', filter_var($this->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
@@ -132,35 +116,26 @@ class Machine implements BREAD
 
   public function count()
   {
-    $query = "SELECT
-      COUNT(*) as total_rows 
-      FROM " . $this->table_name;
-
+    $query = "SELECT COUNT(*) as total_rows FROM " . $this->table_name;
     $stmt = $this->conn->prepare($query);
     $stmt->execute();
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-
     return $row ? $row['total_rows'] : 0;
   }
+
   public function search($keywords)
   {
-    $query = "SELECT
-        *
-        FROM
-        " . $this->table_name . "
-        WHERE
-        machine_code LIKE :machine_code OR location_name LIKE :location_name
-        ORDER BY
-        machine_code ASC";
+    $query = "SELECT *
+      FROM " . $this->table_name . "
+      WHERE machine_code LIKE :machine_code OR location_name LIKE :location_name
+      ORDER BY machine_code ASC";
 
     $stmt = $this->conn->prepare($query);
-
     $keywords = filter_var($keywords, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $keywords = "%{$keywords}%";
 
     $stmt->bindValue(':machine_code', $keywords);
     $stmt->bindValue(':location_name', $keywords);
-
     $stmt->execute();
 
     return $stmt;

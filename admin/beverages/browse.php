@@ -47,7 +47,7 @@ $beverages = callAPI('beverages/browse.php');
                             <td><?= htmlspecialchars($beverage['size'] ?? '-') ?></td>
                             <td>€<?= number_format($beverage['price'], 2, ',', '.') ?></td>
                             <td>
-                                <?php if ($beverage['is_active']): ?>
+                                <?php if (boolval($beverage['is_active'])): ?>
                                     <span class="badge bg-success">Ativa</span>
                                 <?php else: ?>
                                     <span class="badge bg-secondary">Inativa</span>
