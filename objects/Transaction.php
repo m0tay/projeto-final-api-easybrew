@@ -98,13 +98,24 @@ class Transaction implements BREAD
   }
   public function add()
   {
+    // Gerar UUID v4
+    $this->id = sprintf(
+      '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0x0fff) | 0x4000,
+      mt_rand(0, 0x3fff) | 0x8000,
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+
     $query = 'INSERT INTO ' . $this->table_name . '
-      (user_id, machine_id, beverage_id, beverage_name, preparation_chosen, amount, type, status)
+      (id, user_id, machine_id, beverage_id, beverage_name, preparation_chosen, amount, type, status)
       VALUES
-      (:user_id, :machine_id, :beverage_id, :beverage_name, :preparation_chosen, :amount, :type, :status)';
+      (:id, :user_id, :machine_id, :beverage_id, :beverage_name, :preparation_chosen, :amount, :type, :status)';
 
     $stmt = $this->conn->prepare($query);
 
+    $stmt->bindValue(':id', $this->id);
     $stmt->bindValue(':user_id', filter_var($this->user_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':machine_id', filter_var($this->machine_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':beverage_id', filter_var($this->beverage_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
@@ -115,7 +126,6 @@ class Transaction implements BREAD
     $stmt->bindValue(':status', filter_var($this->status, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
-      $this->id = $this->conn->lastInsertId();
       return true;
     }
 

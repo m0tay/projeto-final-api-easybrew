@@ -48,14 +48,26 @@ class Machine implements BREAD
 
   public function add()
   {
+    // Gerar UUID v4
+    $this->id = sprintf(
+      '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0x0fff) | 0x4000,
+      mt_rand(0, 0x3fff) | 0x8000,
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+
     $query = "INSERT INTO " . $this->table_name . "
       SET
+      id = :id,
       machine_code = :machine_code,
       location_name = :location_name,
       api_address = :api_address";
 
     $stmt = $this->conn->prepare($query);
 
+    $stmt->bindValue(':id', $this->id);
     $this->machine_code = filter_var($this->machine_code, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->location_name = filter_var($this->location_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $this->api_address = filter_var($this->api_address, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -65,7 +77,6 @@ class Machine implements BREAD
     $stmt->bindValue(':api_address', $this->api_address);
 
     if ($stmt->execute()) {
-      $this->id = $this->conn->lastInsertId();
       return true;
     }
 

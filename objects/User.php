@@ -70,8 +70,19 @@ class User implements BREAD
    */
   public function add()
   {
+    // Gerar UUID v4
+    $this->id = sprintf(
+      '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0x0fff) | 0x4000,
+      mt_rand(0, 0x3fff) | 0x8000,
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+
     $query = "INSERT INTO " . $this->table_name . "
       SET
+      id = :id,
       email = :email,
       first_name = :first_name,
       last_name = :last_name,
@@ -83,6 +94,8 @@ class User implements BREAD
       email_verification_expires = :expires";
       
     $stmt = $this->conn->prepare($query);
+    
+    $stmt->bindValue(':id', $this->id);
     $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
 
     // tentar extrair nome do email
@@ -102,7 +115,6 @@ class User implements BREAD
     $stmt->bindValue(':expires', $this->email_verification_expires);
 
     if ($stmt->execute()) {
-      $this->id = $this->conn->lastInsertId();
       return true;
     }
 

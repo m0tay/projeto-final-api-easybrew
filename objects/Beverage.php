@@ -57,13 +57,24 @@ class Beverage implements BREAD
 
   public function add()
   {
+    // Gerar UUID v4
+    $this->id = sprintf(
+      '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0x0fff) | 0x4000,
+      mt_rand(0, 0x3fff) | 0x8000,
+      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+    );
+
     $query = 'INSERT INTO ' . $this->table_name . '
-      (name, type, size, preparation, price, description, image, is_active)
+      (id, name, type, size, preparation, price, description, image, is_active)
       VALUES
-      (:name, :type, :size, :preparation, :price, :description, :image, 1)';
+      (:id, :name, :type, :size, :preparation, :price, :description, :image, 1)';
 
     $stmt = $this->conn->prepare($query);
 
+    $stmt->bindValue(':id', $this->id);
     $stmt->bindValue(':name', filter_var($this->name, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':type', filter_var($this->type, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':size', filter_var($this->size, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
@@ -73,7 +84,6 @@ class Beverage implements BREAD
     $stmt->bindValue(':image', filter_var($this->image, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 
     if ($stmt->execute()) {
-      $this->id = $this->conn->lastInsertId();
       return true;
     }
 
