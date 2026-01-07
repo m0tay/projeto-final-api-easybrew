@@ -1,0 +1,567 @@
+# EasyBrew System Context
+
+## System Architecture Overview
+
+### Project: api-easybrew (Main API)
+- **Purpose**: Central management system for coffee machines, users, and transactions
+- **Database**: MySQL (mysql-sa.mgmt.ua.pt:3306, database: esan-dsg24)
+- **Credentials**: DBO (Database Owner) account from .env
+- **Components**: REST API + Admin Panel
+
+### Project: api-machine (Machine API)
+- **Purpose**: Individual coffee machine API instances (one per physical machine)
+- **Database**: Same MySQL server as api-easybrew (centralized)
+- **Credentials**: Same DBO account from .env
+- **Components**: Machine-specific endpoints for beverages and dispensing
+- **Location**: ~/Projects/api-machine/
+
+## Database Schema
+
+### Main API Tables (api-easybrew)
+1. **users**
+   - id (UUID varchar(36) PRIMARY KEY), first_name, last_name, email, password (hashed), role (admin/costumer), balance (DECIMAL)
+   - email_verified (BOOLEAN), email_verification_token (VARCHAR), email_verification_expires (DATETIME)
+   - is_active (BOOLEAN), created_at, updated_at
+   - **IMPORTANT**: No AUTO_INCREMENT, UUID generated in PHP using bin2hex(random_bytes(16)) formatted as UUID v4
+
+2. **machines**
+   - id (UUID varchar(36) PRIMARY KEY), machine_code (e.g., 'UA-M01'), location_name, api_address
+   - is_active (BOOLEAN), created_at, updated_at
+   - **IMPORTANT**: No AUTO_INCREMENT, UUID generated in PHP
+
+3. **transactions**
+   - id (UUID varchar(36) PRIMARY KEY), user_id (FK), machine_id (FK), beverage_id (INT), amount (DECIMAL)
+   - type ENUM('purchase','refund','credit'), status ENUM('pending','completed','failed')
+   - created_at, updated_at
+   - **IMPORTANT**: No AUTO_INCREMENT, UUID generated in PHP
+
+### Machine API Tables (shared, used by api-machine)
+4. **beverages**
+   - id (INT AUTO_INCREMENT), name, type, size
+   - preparation SET('hot','iced','warm','cold') - multiple values allowed
+   - price (DECIMAL), description, image, is_active (BOOLEAN)
+   - created_at, updated_at
+
+5. **machine_beverages** (junction table, N-to-N relationship)
+   - machine_id (UUID, FK to machines.id)
+   - beverage_id (INT, FK to beverages.id)
+   - is_available (BOOLEAN) - per-machine availability toggle
+   - Primary key: (machine_id, beverage_id)
+
+## Machine Instances
+
+### Production Machines:
+1. **UA-M01** - Polo de Artes (6 beverages: Espresso, Americano, Cappuccino, Latte, Hot Chocolate, Green Tea)
+2. **UA-M02** - Cantina (9 beverages: adds Double Espresso, Mocha, Hibiscus Tea)
+3. **UA-M03** - Biblioteca (5 beverages: Espresso, Cappuccino, Latte, Green Tea, Hibiscus Tea)
+
+Each machine instance runs api-machine code with unique .env configuration:
+- MACHINE_ID=<UUID from machines.id where machine_code matches>
+- DB credentials to connect to centralized MySQL
+
+## Key Architecture Decisions
+
+### 1. Data Ownership
+- **Main API (api-easybrew)**: Owns users, machines, transactions
+- **Machine API (api-machine)**: Owns beverages catalog, uses machine_beverages for availability
+- **Shared Database**: Both systems use same MySQL instance, no data duplication
+
+### 2. Beverage Logic Simplification
+- **NO ingredient tracking** - removed complex stock management
+- **NO consume_ingredient()** - simplified make() method only checks is_active
+- **Preparation field**: MySQL SET type allows multiple values (hot,iced,warm,cold)
+- **Beverage.php**: 337 lines → 180 lines (removed Ingredient.php dependency)
+
+### 3. Machine-Beverage Relationship
+- **Junction table pattern**: machine_beverages links machines to beverages
+- **Two availability flags**:
+  - beverages.is_active: Global beverage availability (affects all machines)
+  - machine_beverages.is_available: Per-machine availability toggle
+- **Menu filtering**: api-machine/api/menu.php queries beverages WHERE both flags are true
+
+### 4. Admin Panel Architecture
+- **Server-side rendering**: PHP with cURL, NOT JavaScript SPA
+- **No query parameters**: All data via POST forms with hidden fields
+- **Session + JWT**: JWT stored in $_SESSION, auto-injected by callAPI() helper
+- **Portuguese only**: All UI text in Portuguese
+- **Bootstrap SB Admin template**: DataTables for client-side filtering/pagination
+- **No config_local.php**: Removed dependency, ADMIN_BASE_PATH defined inline where needed
+
+### 5. Authentication & Authorization
+- **JWT with refresh**: api/auth/validate_token.php returns new JWT with updated user data
+- **Email verification**: Users must verify email before login (email_verified flag)
+- **Token expiration**: Email verification tokens expire after set time (email_verification_expires)
+- **Mobile sync**: App saves refreshed JWT and updates local user data on each validation
+- **Role check**: Admin panel requires role='admin', mobile app accepts 'costumer'
+
+### 6. UUID Generation (Critical Fix - Jan 2026)
+- **Database has NO AUTO_INCREMENT on main tables** (users, machines, transactions)
+- **Database has NO UUID() triggers** - PHP must generate UUIDs
+- **Solution implemented**: All PHP objects (User.php, Machine.php, Transaction.php, Beverage.php) generate UUID before INSERT
+- **UUID format**: v4 using `sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', ...)` with bin2hex(random_bytes())
+- **No lastInsertId()**: Removed all calls since UUID is known before INSERT
+
+## Admin Panel Structure
+
+### Files:
+- admin/includes/api_helper.php - cURL wrapper with JWT injection
+- admin/includes/header.php - Bootstrap layout with sidebar
+- admin/includes/footer.php - DataTables initialization (Portuguese)
+- admin/login.php - Authentication (validates admin role)
+- admin/logout.php - Session destruction
+- admin/index.php - Dashboard with stats cards
+
+### BREAD Modules (Browse/Read/Edit/Add/Delete):
+- admin/machines/* - 5 files (complete CRUD)
+- admin/users/* - 5 files (complete CRUD)
+- admin/transactions/* - 5 files (complete CRUD)
+
+### Code Patterns:
+```php
+// API call with automatic JWT injection
+$result = callAPI('endpoint.php', ['field' => 'value']);
+
+// POST form pattern (no query strings)
+<form method="POST" action="edit.php">
+  <input type="hidden" name="id" value="<?= $id ?>">
+  <button type="submit">Editar</button>
+</form>
+
+// Receiving POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['submit'])) {
+  $item = callAPI('endpoint/read.php', ['id' => $_POST['id']]);
+}
+```
+
+## API Endpoints
+
+### Main API (api-easybrew/api/)
+- **auth/login.php** - Returns JWT with user data (requires email_verified=1)
+- **auth/register.php** - Creates user, sends verification email, returns confirmation message
+- **auth/validate_token.php** - Validates JWT, returns NEW JWT with refreshed user data (balance, etc.)
+- **auth/confirm_email.php** - Validates email_verification_token, sets email_verified=1, redirects to login
+- machines/* - BREAD endpoints
+- users/* - BREAD endpoints + search.php
+- transactions/* - BREAD endpoints
+- beverages/* - BREAD endpoints (admin manages beverage catalog)
+
+### Machine API (api-machine/api/)
+- **menu.php** - Returns beverages for specific MACHINE_ID (from .env)
+  - Joins beverages + machine_beverages
+  - Filters by is_active AND is_available
+- **make.php** - Dispenses beverage (validates preparation, checks is_active)
+- **up.php** - Health check
+- **test.php** - Database connection test
+
+## Configuration Files
+
+### api-easybrew/config.php
+- Uses WEB credentials (read-only) for public API endpoints
+- Uses DBO credentials for admin operations
+
+### api-machine/config.php
+- Single $db variable using DBO credentials
+- Removed SQLite legacy code
+- Connects to centralized MySQL
+
+### Environment Variables
+Both projects require .env with:
+```
+DB_HOST=mysql-sa.mgmt.ua.pt
+DB_PORT=3306
+DB_CHARSET=utf8
+DB_NAME=esan-dsg24
+DB_USERNAME_DBO=...
+DB_PASSWORD_DBO=...
+```
+
+api-machine also needs:
+```
+MACHINE_ID=<UUID from machines table>
+```
+
+## Migration History
+
+### Phase 1: Admin Panel Creation
+- Created complete admin interface with BREAD for all entities
+- Implemented session-based authentication with JWT storage
+- Added Portuguese DataTables with client-side filtering
+
+### Phase 2: Machine API MySQL Migration
+- Migrated from SQLite to centralized MySQL
+- Created beverages + machine_beverages tables
+- Simplified Beverage.php (removed ingredient system)
+- Updated menu.php with machine-specific filtering
+- Created seed files for 3 machines
+
+## SQL Scripts Location
+~/Projects/PRJ EASYBREW STUFF/
+- machine_beverages_mysql_schema.sql - Creates beverages + machine_beverages tables
+- UA-M01_seed.sql - Seeds 6 beverages for Polo de Artes
+- UA-M02_seed.sql - Seeds 9 beverages for Cantina
+- UA-M03_seed.sql - Seeds 5 beverages for Biblioteca
+
+## Important Notes
+
+### Security:
+- SSL verification disabled (development environment, self-signed certs)
+- CURLOPT_SSL_VERIFYPEER=false in admin/includes/api_helper.php
+- JWT stored in session, 1 hour expiration default
+- Admin role check required for all admin panel access
+
+### Database:
+- Remote MySQL server (cannot create tables directly via PHP)
+- Foreign keys in machine_beverages require machines table entries first
+- SET field preparation returns comma-separated string in PHP
+- Use explode(',', $value) for validation
+
+### Code Style:
+- No comments in code (user preference)
+- Portuguese interface only
+- Brief, concise responses preferred
+- No verbose explanations unless asked
+
+### Development Workflow:
+- User develops locally then pushes to server manually
+- **User has VPN access** - handles all server deployments
+- **DO NOT attempt deployments** - User will deploy when ready
+- Three machine instances (UA-M01, UA-M02, UA-M03) run on server
+- Database is shared, credentials in .env (blocked from reading)
+
+## Current Status
+
+### Completed:
+- ✅ Admin panel with complete BREAD for machines, users, transactions
+- ✅ Machine API migrated to MySQL
+- ✅ Simplified beverage logic (no ingredient tracking)
+- ✅ SQL schema and seed files created
+- ✅ UUID generation fixed in all PHP objects (User, Beverage, Machine, Transaction)
+- ✅ Auth system fixed: validate_token now returns updated user data with new JWT
+- ✅ Mobile app updated to save refreshed JWT and user data (SplashScreen, RecyclerViewMenuFragment, BeveragesAdapter)
+- ✅ Email confirmation flow tested and working
+- ✅ Removed config_local.php dependency from admin panel (11 files updated)
+
+### Pending:
+- ⏳ Deploy admin panel changes to server (user will do manually)
+- ⏳ Run SQL scripts on MySQL server (requires user action)
+- ⏳ Update .env MACHINE_ID for each machine instance
+- ⏳ Test machine API endpoints
+- ⏳ Test complete purchase flow (mobile → API → balance update)
+
+### Optional Future Enhancements:
+- Machine-beverage association interface (toggle is_available)
+- Enhanced dashboard analytics
+- Backup/restore functionality
+- Beverage image uploads in admin panel
+
+## Recent Changes (January 2026)
+
+### UUID Generation Fix
+**Problem**: Database tables (users, machines, transactions) use UUID varchar(36) as PRIMARY KEY but have:
+- No AUTO_INCREMENT
+- No database triggers to generate UUID()
+- PHP code was calling `$this->conn->lastInsertId()` which returned empty string
+
+**Solution**:
+- Added UUID v4 generation to all object classes (User.php, Beverage.php, Machine.php, Transaction.php)
+- UUID generated in PHP before INSERT: `sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x', ...)`
+- Removed all `lastInsertId()` calls
+- INSERT now includes `id` field with generated UUID
+
+**Files changed**:
+- objects/User.php - create() method
+- objects/Beverage.php - create() method
+- objects/Machine.php - create() method
+- objects/Transaction.php - create() method
+
+### Authentication System Enhancement
+**Problem**: Mobile app balance not updating after transactions
+
+**Solution**:
+- Modified api/auth/validate_token.php to:
+  1. Query database for fresh user data (not just decode JWT)
+  2. Generate NEW JWT with updated data
+  3. Return new JWT in response
+- Updated mobile app (Kotlin) to save new JWT from validate_token response:
+  - app/src/main/java/pm/easybrew/SplashScreen.kt
+  - app/src/main/java/pm/easybrew/RecyclerViewMenuFragment.kt
+  - app/src/main/java/pm/easybrew/adapters/BeveragesAdapter.kt
+
+**Result**: User data (balance, first_name, etc.) now syncs on every app launch and beverage list refresh
+
+### Admin Panel config_local.php Removal
+**Problem**: 11 admin files required `config_local.php` which didn't exist on server, causing fatal error on email confirmation redirect
+
+**Solution**:
+- Removed all `require_once __DIR__ . '/../config_local.php';` lines
+- Added inline `ADMIN_BASE_PATH` definition in login.php and logout.php
+- `ADMIN_BASE_PATH` already defined in includes/api_helper.php, which other files include
+
+**Files changed**:
+- admin/login.php
+- admin/logout.php
+- admin/includes/header.php
+- admin/beverages/edit.php, delete.php
+- admin/users/edit.php, delete.php
+- admin/machines/edit.php, delete.php
+- admin/transactions/edit.php, delete.php
+
+**Result**: Email confirmation now successfully redirects to admin login page without errors
+
+## Common Issues & Solutions
+
+### Issue: Menu API returns empty array
+- **Cause**: Missing MACHINE_ID in .env or no beverages linked
+- **Solution**: Verify MACHINE_ID matches machines.id, check machine_beverages entries
+
+### Issue: Admin panel 401 errors
+- **Cause**: JWT expired or invalid session
+- **Solution**: Re-login, check JWT expiration in auth/login.php
+
+### Issue: make.php fails with "Bebida indisponível"
+- **Cause**: is_active=0 on beverage
+- **Solution**: Update beverages.is_active=1 or machine_beverages.is_available=1
+
+### Issue: SET field validation fails
+- **Cause**: Preparation validation not handling comma-separated values
+- **Solution**: Use explode(',', $db_value) to get array, check against input
+
+### Issue: Empty UUID or lastInsertId() fails
+- **Cause**: Database has no AUTO_INCREMENT, no UUID triggers, lastInsertId() returns empty
+- **Solution**: UUID must be generated in PHP before INSERT (fixed in all object classes)
+
+### Issue: Mobile app balance not updating
+- **Cause**: App was decoding old JWT without refreshing from database
+- **Solution**: validate_token now returns new JWT with fresh data, app saves it (fixed)
+
+### Issue: config_local.php not found on server
+- **Cause**: File was for local testing only, 11 admin files required it
+- **Solution**: Removed all config_local.php references, define ADMIN_BASE_PATH inline (fixed)
+
+## Cross-Project Dependencies
+
+### api-easybrew depends on:
+- MySQL server availability
+- machines table for admin panel CRUD
+- transactions table references beverage_id (INT) from api-machine
+
+### api-machine depends on:
+- MySQL server availability
+- machines table for MACHINE_ID lookup
+- beverages + machine_beverages tables
+- transactions table (api-easybrew) for purchase recording
+
+### Shared Resources:
+- MySQL database server
+- DBO credentials
+- machines table (central registry)
+- beverages catalog (machine API owns, main API references)
+
+## Testing Checklist
+
+### After SQL Scripts Run:
+1. Verify tables created: `SHOW TABLES LIKE '%beverage%';`
+2. Check beverage count: `SELECT COUNT(*) FROM beverages;` (should be 14 total unique)
+3. Check associations: `SELECT COUNT(*) FROM machine_beverages;` (should be 20 total)
+4. Get machine IDs: `SELECT id, machine_code FROM machines;`
+
+### Admin Panel Testing:
+1. Login with admin credentials
+2. Browse each entity (machines, users, transactions)
+3. Test add/edit/delete operations
+4. Verify DataTables filtering works
+5. Check dashboard stats display correctly
+
+### Machine API Testing:
+1. Test menu.php per machine (should return different beverage counts)
+2. Test make.php with valid beverage_id + preparation
+3. Test up.php health check
+4. Verify MACHINE_ID from .env filters correctly
+
+## File Structure Reference
+
+```
+api-easybrew/
+├── admin/
+│   ├── includes/ (api_helper.php, header.php, footer.php)
+│   ├── machines/ (5 BREAD files)
+│   ├── users/ (5 BREAD files)
+│   ├── transactions/ (5 BREAD files)
+│   ├── index.php, login.php, logout.php
+│   ├── css/, js/, assets/
+├── api/
+│   ├── auth/ (login, register, validate_token)
+│   ├── machines/ (BREAD + make, menu, search, up)
+│   ├── users/ (BREAD + search)
+│   ├── transactions/ (BREAD)
+│   └── up.php
+├── objects/ (User.php, Machine.php, Transaction.php, BREAD.php)
+├── config.php, core.php
+├── .env, .gitignore
+└── .phpconfig (this file)
+
+api-machine/
+├── api/
+│   ├── make.php (simplified, no ingredients)
+│   ├── menu.php (with MACHINE_ID filtering)
+│   ├── test.php, up.php
+├── objects/
+│   ├── Beverage.php (simplified, 180 lines)
+│   └── BREAD.php
+├── config.php (MySQL with $db)
+├── core.php (connectDB function)
+├── .env, .gitignore
+└── .phpconfig (this file)
+```
+
+## Integration Points
+
+### Transaction Creation Flow:
+1. User scans QR code or opens app (SplashScreen validates token, gets fresh user data)
+2. User selects beverage from api-machine/api/menu.php
+3. User confirms purchase in mobile app
+4. Mobile app calls api-easybrew/api/transactions/add.php with:
+   - user_id (from JWT)
+   - machine_id (from QR code or location)
+   - beverage_id (from menu selection)
+   - amount (from beverage price)
+5. Main API creates transaction record (generates UUID in PHP)
+6. Main API deducts balance from user
+7. Main API returns success/failure
+8. On success, mobile app calls api-machine/api/make.php
+9. Machine dispenses beverage
+10. User returns to menu, app refreshes and gets updated balance via validate_token
+3. Mobile app calls api-easybrew/api/transactions/add.php with:
+   - user_id (from JWT)
+   - machine_id (from QR code or location)
+   - beverage_id (from menu selection)
+   - amount (from beverage price)
+4. Main API creates transaction record
+5. Main API deducts balance from user
+6. Main API returns success/failure
+7. On success, mobile app calls api-machine/api/make.php
+8. Machine dispenses beverage
+
+### Menu Display Flow:
+1. Mobile app scans QR code with machine_id
+2. Mobile app identifies machine's api_address from machines table
+3. Mobile app calls {api_address}/api/menu.php
+4. Machine API returns beverages filtered by MACHINE_ID
+5. Mobile app displays available beverages with prices
+
+### Admin Management Flow:
+1. Admin logs into admin panel (admin/login.php)
+2. Admin manages machines (add/edit location, api_address, is_active)
+3. Admin manages users (add/edit balance, role, is_active)
+4. Admin views transactions (browse, filter by user/machine/date)
+5. Admin can edit transaction status (pending → completed/failed)
+6. Future: Admin manages beverages (add/edit/delete from catalog)
+7. Future: Admin manages machine-beverage associations (toggle is_available)
+
+## Performance Considerations
+
+### DataTables:
+- Client-side processing (all data loaded at once)
+- Good for <1000 records per table
+- Portuguese language file loaded from CDN
+- Custom date sorting for created_at/updated_at columns
+
+### Database Indexes:
+- Primary keys on all tables (UUID for main entities, INT for beverages)
+- Foreign keys with indexes on machine_beverages
+- Composite index on (machine_id, beverage_id) for menu queries
+- Consider adding index on transactions(user_id, created_at) for user history
+
+### Caching:
+- No caching currently implemented
+- Consider PHP opcache for production
+- Consider Redis for session storage (currently file-based)
+- Consider caching menu.php results per machine (5-minute TTL)
+
+## Deployment Notes
+
+### Local Development:
+- Both projects in ~/Projects/
+- MySQL server is remote (not localhost)
+- Use .env.example as template, copy to .env with credentials
+
+### Production Deployment:
+- User deploys locally then pushes to server
+- Three separate directories on server for machine instances
+- Each machine instance has unique .env with MACHINE_ID
+- Single MySQL database shared across all instances
+- Admin panel deployed once (accesses main API)
+
+### Server Structure (assumed):
+```
+/var/www/
+├── api-easybrew/ (main API + admin panel)
+├── machines/
+│   ├── ua-m01/ (api-machine instance for Polo de Artes)
+│   ├── ua-m02/ (api-machine instance for Cantina)
+│   └── ua-m03/ (api-machine instance for Biblioteca)
+```
+
+### URLs (assumed):
+- Main API: https://api.easybrew.ua.pt/
+- Admin Panel: https://api.easybrew.ua.pt/admin/
+- Machine 01: https://api.easybrew.ua.pt/machines/ua-m01/
+- Machine 02: https://api.easybrew.ua.pt/machines/ua-m02/
+- Machine 03: https://api.easybrew.ua.pt/machines/ua-m03/
+
+## Future Considerations
+
+### Scalability:
+- Current design supports unlimited machines (just add to machines table)
+- Beverage catalog shared across all machines (add once, use everywhere)
+- Junction table allows flexible machine-beverage associations
+- Consider partitioning transactions table by date if volume grows
+
+### Feature Ideas:
+- Real-time machine status monitoring (online/offline)
+- Inventory management (if ingredient tracking restored)
+- Loyalty program (reward points based on purchases)
+- Scheduled reports (daily/weekly transaction summaries)
+- Mobile app push notifications (low balance, new beverages)
+- QR code generation for machines (admin panel)
+- User feedback/ratings for beverages
+- Beverage recommendations based on purchase history
+
+### Security Enhancements:
+- Enable SSL verification in production
+- Rate limiting on API endpoints
+- Audit logging for admin actions
+- Two-factor authentication for admin accounts
+- Rotate JWT secrets periodically
+- Hash machine_code in QR codes (prevent tampering)
+
+## Troubleshooting Guide
+
+### Symptom: "Undefined variable: $db"
+- **Location**: api-machine
+- **Cause**: config.php not included, or connectDB() not called
+- **Fix**: Ensure `include_once '../config.php';` and `$db = connectDB();` at top of file
+
+### Symptom: "SQLite readonly database"
+- **Cause**: Legacy code trying to use old SQLite database
+- **Fix**: Verify config.php uses MySQL credentials, check for old db filename references
+
+### Symptom: Empty menu.php response
+- **Cause**: MACHINE_ID missing, no beverages linked, or both is_active flags false
+- **Fix**: Check .env has MACHINE_ID, query machine_beverages table, verify flags
+
+### Symptom: 401 Unauthorized in admin panel
+- **Cause**: JWT expired, session destroyed, or invalid token
+- **Fix**: Logout and re-login, check session.gc_maxlifetime in php.ini
+
+### Symptom: DataTables not loading
+- **Cause**: CDN blocked, JavaScript error, or incorrect table structure
+- **Fix**: Check browser console, verify footer.php included, check DataTables CDN URLs
+
+### Symptom: Foreign key constraint violation
+- **Cause**: Trying to insert machine_beverages before machines entry exists
+- **Fix**: Ensure machines table populated before running seed files
+
+### Symptom: SET field validation fails
+- **Cause**: Comparing string directly instead of array
+- **Fix**: Use `in_array($input, explode(',', $db_preparation))` for validation
