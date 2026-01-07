@@ -5,7 +5,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
     }
     require_once __DIR__ . '/../../config.php';
     require_once __DIR__ . '/../../core.php';
-    require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $preparation = filter_input(INPUT_POST, 'preparation', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);

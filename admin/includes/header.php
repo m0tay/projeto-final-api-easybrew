@@ -1,6 +1,5 @@
 <?php
 require_once __DIR__ . '/../../config.php';
-require_once __DIR__ . '/../config_local.php';
 session_start();
 require_once __DIR__ . '/api_helper.php';
 requireLogin();

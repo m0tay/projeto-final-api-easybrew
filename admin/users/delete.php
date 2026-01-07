@@ -4,7 +4,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm')
         session_start();
     }
     require_once __DIR__ . '/../../config.php';
-    require_once __DIR__ . '/../config_local.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $result = callAPI('users/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);

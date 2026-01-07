@@ -4,7 +4,9 @@ require_once '../core.php';
 
 session_start();
 
-require_once __DIR__ . '/config_local.php';
+if (!defined('ADMIN_BASE_PATH')) {
+    define('ADMIN_BASE_PATH', '/tesp-ds-g24/projeto/admin');
+}
 
 if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header('Location: ' . ADMIN_BASE_PATH . '/index.php');
