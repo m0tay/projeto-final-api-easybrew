@@ -24,16 +24,16 @@ $guru = $_ENV['GURU'];
 $dsg_dbo = [
   'host' => $_ENV['DB_HOST'],
   'port' => $_ENV['DB_PORT'],
-  'charset' => $_ENV['DB_CHARSET'],
-  'dbname' => $_ENV['DB_NAME'],
+  'charset' => 'latin1',
+  'dbname' => 'esan-dsg24',
   'username' => $_ENV['DB_USERNAME_DBO'],
   'password' => $_ENV['DB_PASSWORD_DBO']
 ];
 $dsg_web = [
   'host' => $_ENV['DB_HOST'],
   'port' => $_ENV['DB_PORT'],
-  'charset' => $_ENV['DB_CHARSET'],
-  'dbname' => $_ENV['DB_NAME'],
+  'charset' => 'latin1',
+  'dbname' => 'esan-dsg24',
   'username' => $_ENV['DB_USERNAME_WEB'],
   'password' => $_ENV['DB_PASSWORD_WEB']
 ];

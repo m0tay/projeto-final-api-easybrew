@@ -76,7 +76,7 @@ class User implements BREAD
       first_name = :first_name,
       last_name = :last_name,
       password_hash = :password_hash,
-      role = 'customer',
+      role = 'costumer',
       balance = 0.0,
       email_verified = 0,
       email_verification_token = :token,
