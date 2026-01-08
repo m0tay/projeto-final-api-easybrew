@@ -117,10 +117,10 @@ class Transaction implements BREAD
 
     $stmt->bindValue(':id', $this->id);
     $stmt->bindValue(':user_id', filter_var($this->user_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-    $stmt->bindValue(':machine_id', filter_var($this->machine_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':machine_id', $this->machine_id === null ? null : filter_var($this->machine_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':beverage_id', filter_var($this->beverage_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':beverage_name', filter_var($this->beverage_name, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-    $stmt->bindValue(':preparation_chosen', filter_var($this->preparation_chosen, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+    $stmt->bindValue(':preparation_chosen', $this->preparation_chosen === null ? null : filter_var($this->preparation_chosen, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':amount', filter_var($this->amount, FILTER_VALIDATE_FLOAT));
     $stmt->bindValue(':type', filter_var($this->type, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
     $stmt->bindValue(':status', filter_var($this->status, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
