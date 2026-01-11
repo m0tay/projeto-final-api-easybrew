@@ -23,13 +23,13 @@ if (!$user) {
 <h1 class="mt-4">Detalhes do Utilizador</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Utilizadores</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/users/browse.php">Utilizadores</a></li>
     <li class="breadcrumb-item active">Ver</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -37,7 +37,7 @@ if (!$user) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-user me-1"></i>
-        Utilizador #<?= htmlspecialchars($user['id']) ?? "N/A" ?>
+        Utilizador #<?= h($user['id']) ?? "N/A" ?>
     </div>
     <div class="card-body">
         <div class="mb-3 text-center">
@@ -48,19 +48,19 @@ if (!$user) {
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($user['id']) ?? "N/A" ?></td>
+                <td><?= h($user['id']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Primeiro Nome</th>
-                <td><?= htmlspecialchars($user['first_name']) ?? "N/A" ?></td>
+                <td><?= h($user['first_name']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Último Nome</th>
-                <td><?= htmlspecialchars($user['last_name']) ?? "N/A" ?></td>
+                <td><?= h($user['last_name']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td><?= htmlspecialchars($user['email']) ?? "N/A" ?></td>
+                <td><?= h($user['email']) ?? "N/A" ?></td>
             </tr>
             <tr>
                 <th>Função</th>
@@ -98,20 +98,20 @@ if (!$user) {
         
         <div class="mt-4">
             <form method="POST" action="edit.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?? "N/A" ?>">
+                <input type="hidden" name="id" value="<?= h($user['id']) ?? "N/A" ?>">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editar
                 </button>
             </form>
             
             <form method="POST" action="delete.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?? "N/A" ?>">
+                <input type="hidden" name="id" value="<?= h($user['id']) ?? "N/A" ?>">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash"></i> Apagar
                 </button>
             </form>
             
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/users/browse.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>

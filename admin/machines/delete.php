@@ -41,13 +41,13 @@ if (!$machine) {
 <h1 class="mt-4">Apagar Máquina</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Apagar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -66,19 +66,19 @@ if (!$machine) {
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($machine['id']) ?></td>
+                <td><?= h($machine['id']) ?></td>
             </tr>
             <tr>
                 <th>Código da Máquina</th>
-                <td><?= htmlspecialchars($machine['machine_code']) ?></td>
+                <td><?= h($machine['machine_code']) ?></td>
             </tr>
             <tr>
                 <th>Nome do Local</th>
-                <td><?= htmlspecialchars($machine['location_name']) ?></td>
+                <td><?= h($machine['location_name']) ?></td>
             </tr>
             <tr>
                 <th>Endereço API</th>
-                <td><?= htmlspecialchars($machine['api_address']) ?></td>
+                <td><?= h($machine['api_address']) ?></td>
             </tr>
             <tr>
                 <th>Estado</th>
@@ -97,11 +97,11 @@ if (!$machine) {
         </table>
         
         <form method="POST" class="mt-4">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($machine['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($machine['id']) ?>">
             <button type="submit" name="confirm" class="btn btn-danger">
                 <i class="fas fa-trash"></i> Confirmar Eliminação
             </button>
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </form>

@@ -41,13 +41,13 @@ if (!$user) {
 <h1 class="mt-4">Apagar Utilizador</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Utilizadores</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/users/browse.php">Utilizadores</a></li>
     <li class="breadcrumb-item active">Apagar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -66,15 +66,15 @@ if (!$user) {
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($user['id']) ?></td>
+                <td><?= h($user['id']) ?></td>
             </tr>
             <tr>
                 <th>Nome</th>
-                <td><?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?></td>
+                <td><?= h($user['first_name'] . ' ' . $user['last_name']) ?></td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td><?= htmlspecialchars($user['email']) ?></td>
+                <td><?= h($user['email']) ?></td>
             </tr>
             <tr>
                 <th>Função</th>
@@ -107,11 +107,11 @@ if (!$user) {
         </table>
         
         <form method="POST" class="mt-4">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($user['id']) ?>">
             <button type="submit" name="confirm" class="btn btn-danger">
                 <i class="fas fa-trash"></i> Confirmar Eliminação
             </button>
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/users/browse.php" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </form>

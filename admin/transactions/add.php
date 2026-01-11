@@ -39,13 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <h1 class="mt-4">Adicionar Transação</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Transações</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Transações</a></li>
     <li class="breadcrumb-item active">Adicionar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -64,8 +64,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select class="form-select" id="user_id" name="user_id" required>
                             <option value="">Selecione um utilizador...</option>
                             <?php foreach ($users as $user): ?>
-                                <option value="<?= htmlspecialchars($user['id']) ?>">
-                                    #<?= htmlspecialchars($user['id']) ?> - <?= htmlspecialchars($user['first_name'] . ' ' . $user['last_name']) ?> (<?= htmlspecialchars($user['email']) ?>)
+                                <option value="<?= h($user['id']) ?>">
+                                    #<?= h($user['id']) ?> - <?= h($user['first_name'] . ' ' . $user['last_name']) ?> (<?= h($user['email']) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -77,8 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select class="form-select" id="machine_id" name="machine_id" required>
                             <option value="">Selecione uma máquina...</option>
                             <?php foreach ($machines as $machine): ?>
-                                <option value="<?= htmlspecialchars($machine['id']) ?>">
-                                    #<?= htmlspecialchars($machine['id']) ?> - <?= htmlspecialchars($machine['machine_code']) ?> (<?= htmlspecialchars($machine['location_name']) ?>)
+                                <option value="<?= h($machine['id']) ?>">
+                                    #<?= h($machine['id']) ?> - <?= h($machine['machine_code']) ?> (<?= h($machine['location_name']) ?>)
                                 </option>
                             <?php endforeach; ?>
                         </select>
@@ -144,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Criar Transação
                 </button>
-                <a href="browse.php" class="btn btn-secondary">
+                <a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>

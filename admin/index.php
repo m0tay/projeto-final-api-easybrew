@@ -6,7 +6,7 @@ $users_result = callAPI('users/browse.php');
 $transactions_result = callAPI('transactions/browse.php');
 
 $total_machines = count($machines_result['records'] ?? []);
-$active_machines = count(array_filter($machines_result['records'] ?? [], fn($m) => boolval($m['is_active'])));
+$active_machines = count(array_filter($machines_result['records'] ?? [], fn($m) => !empty($m['is_active'])));
 $total_users = count($users_result['records'] ?? []);
 $total_transactions = count($transactions_result['records'] ?? []);
 
@@ -89,7 +89,7 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
                 </div>
             </div>
             <div class="card-footer d-flex align-items-center justify-content-between">
-                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Ver Detalhes</a>
+                <a class="small text-white stretched-link" href="<?= ADMIN_BASE_PATH ?>/users/browse.php">Ver Detalhes</a>
                 <div class="small text-white"><i class="fas fa-angle-right"></i></div>
             </div>
         </div>
@@ -128,21 +128,21 @@ $recent_transactions = array_slice($transactions_result['records'] ?? [], 0, 10)
             <tbody>
                 <?php foreach($recent_transactions as $t): ?>
                 <tr>
-                    <td><?= htmlspecialchars($t['id']) ?></td>
-                    <td><?= htmlspecialchars($t['user_id']) ?></td>
-                    <td><?= htmlspecialchars($t['machine_id']) ?></td>
-                    <td><?= htmlspecialchars($t['beverage_name']) ?></td>
-                    <td>€<?= number_format($t['amount'], 2, ',', '.') ?></td>
+                    <td><?= h($t['id']) ?></td>
+                    <td><?= h($t['user_id']) ?></td>
+                    <td><?= h($t['machine_id']) ?: '-' ?></td>
+                    <td><?= h($t['beverage_name']) ?: '-' ?></td>
+                    <td>€<?= number_format($t['amount'] ?? 0, 2, ',', '.') ?></td>
                     <td>
                         <?php
                         $badge_class = 'secondary';
-                        if ($t['status'] === 'completed') $badge_class = 'success';
-                        if ($t['status'] === 'failed') $badge_class = 'danger';
-                        if ($t['status'] === 'pending') $badge_class = 'warning';
+                        if (($t['status'] ?? '') === 'completed') $badge_class = 'success';
+                        if (($t['status'] ?? '') === 'failed') $badge_class = 'danger';
+                        if (($t['status'] ?? '') === 'pending') $badge_class = 'warning';
                         ?>
-                        <span class="badge bg-<?= $badge_class ?>"><?= htmlspecialchars($t['status']) ?></span>
+                        <span class="badge bg-<?= $badge_class ?>"><?= h($t['status']) ?: 'N/A' ?></span>
                     </td>
-                    <td><?= date('d/m/Y H:i', strtotime($t['created_at'])) ?></td>
+                    <td><?= isset($t['created_at']) ? date('d/m/Y H:i', strtotime($t['created_at'])) : 'N/A' ?></td>
                 </tr>
                 <?php endforeach; ?>
                 <?php if (empty($recent_transactions)): ?>

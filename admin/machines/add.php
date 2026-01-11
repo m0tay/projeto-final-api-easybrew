@@ -24,13 +24,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
 <h1 class="mt-4">Adicionar Máquina</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Adicionar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
                 <button type="submit" name="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Adicionar
                 </button>
-                <a href="browse.php" class="btn btn-secondary">
+                <a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>

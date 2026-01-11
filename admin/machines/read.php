@@ -23,13 +23,13 @@ if (!$machine) {
 <h1 class="mt-4">Detalhes da Máquina</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Máquinas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php">Máquinas</a></li>
     <li class="breadcrumb-item active">Ver</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -37,25 +37,25 @@ if (!$machine) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-coffee me-1"></i>
-        Máquina #<?= htmlspecialchars($machine['id']) ?>
+        Máquina #<?= h($machine['id']) ?>
     </div>
     <div class="card-body">
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($machine['id']) ?></td>
+                <td><?= h($machine['id']) ?></td>
             </tr>
             <tr>
                 <th>Código da Máquina</th>
-                <td><?= htmlspecialchars($machine['machine_code']) ?></td>
+                <td><?= h($machine['machine_code']) ?></td>
             </tr>
             <tr>
                 <th>Nome do Local</th>
-                <td><?= htmlspecialchars($machine['location_name']) ?></td>
+                <td><?= h($machine['location_name']) ?></td>
             </tr>
             <tr>
                 <th>Endereço API</th>
-                <td><?= htmlspecialchars($machine['api_address']) ?></td>
+                <td><?= h($machine['api_address']) ?></td>
             </tr>
             <tr>
                 <th>Estado</th>
@@ -79,20 +79,20 @@ if (!$machine) {
         
         <div class="mt-4">
             <form method="POST" action="edit.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($machine['id']) ?>">
+                <input type="hidden" name="id" value="<?= h($machine['id']) ?>">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editar
                 </button>
             </form>
             
             <form method="POST" action="delete.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($machine['id']) ?>">
+                <input type="hidden" name="id" value="<?= h($machine['id']) ?>">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash"></i> Apagar
                 </button>
             </form>
             
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/machines/browse.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>

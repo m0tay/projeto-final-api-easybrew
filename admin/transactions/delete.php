@@ -41,13 +41,13 @@ if (!$transaction) {
 <h1 class="mt-4">Apagar Transação</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Transações</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Transações</a></li>
     <li class="breadcrumb-item active">Apagar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -66,19 +66,19 @@ if (!$transaction) {
         <table class="table table-bordered">
             <tr>
                 <th style="width: 250px;">ID</th>
-                <td><?= htmlspecialchars($transaction['id']) ?></td>
+                <td><?= h($transaction['id']) ?></td>
             </tr>
             <tr>
                 <th>ID do Utilizador</th>
-                <td><?= htmlspecialchars($transaction['user_id']) ?></td>
+                <td><?= h($transaction['user_id']) ?></td>
             </tr>
             <tr>
                 <th>ID da Máquina</th>
-                <td><?= htmlspecialchars($transaction['machine_id']) ?></td>
+                <td><?= h($transaction['machine_id']) ?></td>
             </tr>
             <tr>
                 <th>Bebida</th>
-                <td><?= htmlspecialchars($transaction['beverage_name']) ?> (<?= htmlspecialchars($transaction['preparation_chosen']) ?>)</td>
+                <td><?= h($transaction['beverage_name']) ?> (<?= h($transaction['preparation_chosen']) ?>)</td>
             </tr>
             <tr>
                 <th>Valor</th>
@@ -92,7 +92,7 @@ if (!$transaction) {
                     <?php elseif ($transaction['type'] === 'refund'): ?>
                         <span class="badge bg-warning">Reembolso</span>
                     <?php else: ?>
-                        <span class="badge bg-secondary"><?= htmlspecialchars($transaction['type']) ?></span>
+                        <span class="badge bg-secondary"><?= h($transaction['type']) ?></span>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -106,7 +106,7 @@ if (!$transaction) {
                     <?php elseif ($transaction['status'] === 'failed'): ?>
                         <span class="badge bg-danger">Falhado</span>
                     <?php else: ?>
-                        <span class="badge bg-secondary"><?= htmlspecialchars($transaction['status']) ?></span>
+                        <span class="badge bg-secondary"><?= h($transaction['status']) ?></span>
                     <?php endif; ?>
                 </td>
             </tr>
@@ -117,11 +117,11 @@ if (!$transaction) {
         </table>
         
         <form method="POST" class="mt-4">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($transaction['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($transaction['id']) ?>">
             <button type="submit" name="confirm" class="btn btn-danger">
                 <i class="fas fa-trash"></i> Confirmar Eliminação
             </button>
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </form>

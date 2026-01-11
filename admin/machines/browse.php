@@ -3,6 +3,11 @@ require_once __DIR__ . '/../includes/header.php';
 
 $result = callAPI('machines/browse.php');
 $machines = $result['records'] ?? [];
+$error = '';
+
+if (isset($result['message']) && empty($machines)) {
+    $error = $result['message'];
+}
 ?>
 
 <h1 class="mt-4">Máquinas</h1>
@@ -10,6 +15,13 @@ $machines = $result['records'] ?? [];
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
     <li class="breadcrumb-item active">Máquinas</li>
 </ol>
+
+<?php if ($error): ?>
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <?= h($error) ?>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+<?php endif; ?>
 
 <div class="mb-3">
     <a href="add.php" class="btn btn-primary">
@@ -23,6 +35,12 @@ $machines = $result['records'] ?? [];
         Lista de Máquinas
     </div>
     <div class="card-body">
+        <?php if (empty($machines)): ?>
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                Não existem máquinas registadas. Clique em "Adicionar Máquina" para criar a primeira.
+            </div>
+        <?php else: ?>
         <table id="datatablesSimple">
             <thead>
                 <tr>
@@ -37,12 +55,12 @@ $machines = $result['records'] ?? [];
             <tbody>
                 <?php foreach($machines as $m): ?>
                 <tr>
-                    <td><?= htmlspecialchars($m['id']) ?></td>
-                    <td><?= htmlspecialchars($m['machine_code']) ?></td>
-                    <td><?= htmlspecialchars($m['location_name']) ?></td>
-                    <td><?= htmlspecialchars($m['api_address']) ?></td>
+                    <td><?= h($m['id']) ?></td>
+                    <td><?= h($m['machine_code']) ?></td>
+                    <td><?= h($m['location_name']) ?></td>
+                    <td><?= h($m['api_address']) ?></td>
                     <td>
-                        <?php if (boolval($m['is_active'])): ?>
+                        <?php if (!empty($m['is_active'])): ?>
                             <span class="badge bg-success">Ativa</span>
                         <?php else: ?>
                             <span class="badge bg-danger">Inativa</span>
@@ -72,6 +90,7 @@ $machines = $result['records'] ?? [];
                 <?php endforeach; ?>
             </tbody>
         </table>
+        <?php endif; ?>
     </div>
 </div>
 

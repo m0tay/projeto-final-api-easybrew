@@ -43,13 +43,13 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
 <h1 class="mt-4">Apagar Bebida</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Bebidas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php">Bebidas</a></li>
     <li class="breadcrumb-item active">Apagar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -74,26 +74,26 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($beverage['id']) ?></td>
+                <td><?= h($beverage['id']) ?></td>
             </tr>
             <tr>
                 <th>Nome</th>
-                <td><?= htmlspecialchars($beverage['name']) ?></td>
+                <td><?= h($beverage['name']) ?></td>
             </tr>
             <tr>
                 <th>Tipo</th>
-                <td><?= htmlspecialchars($beverage['type'] ?? 'N/A') ?></td>
+                <td><?= h($beverage['type'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Tamanho</th>
-                <td><?= htmlspecialchars($beverage['size'] ?? 'N/A') ?></td>
+                <td><?= h($beverage['size'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Preparação</th>
                 <td>
                     <?php if (!empty($preparation_array)): ?>
                         <?php foreach ($preparation_array as $prep): ?>
-                            <span class="badge bg-info me-1"><?= htmlspecialchars(ucfirst($prep)) ?></span>
+                            <span class="badge bg-info me-1"><?= h(ucfirst($prep)) ?></span>
                         <?php endforeach; ?>
                     <?php else: ?>
                         N/A
@@ -117,11 +117,11 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
         </table>
         
         <form method="POST" class="mt-4">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($beverage['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($beverage['id']) ?>">
             <button type="submit" name="confirm" class="btn btn-danger">
                 <i class="fas fa-trash"></i> Confirmar Eliminação
             </button>
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php" class="btn btn-secondary">
                 <i class="fas fa-times"></i> Cancelar
             </a>
         </form>

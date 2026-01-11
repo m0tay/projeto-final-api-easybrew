@@ -25,13 +25,13 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
 <h1 class="mt-4">Detalhes da Bebida</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Bebidas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php">Bebidas</a></li>
     <li class="breadcrumb-item active">Ver</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -39,7 +39,7 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-coffee me-1"></i>
-        Bebida #<?= htmlspecialchars($beverage['id']) ?>
+        Bebida #<?= h($beverage['id']) ?>
     </div>
     <div class="card-body">
         <div class="mb-3 text-center">
@@ -50,26 +50,26 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= htmlspecialchars($beverage['id']) ?></td>
+                <td><?= h($beverage['id']) ?></td>
             </tr>
             <tr>
                 <th>Nome</th>
-                <td><?= htmlspecialchars($beverage['name']) ?></td>
+                <td><?= h($beverage['name']) ?></td>
             </tr>
             <tr>
                 <th>Tipo</th>
-                <td><?= htmlspecialchars($beverage['type'] ?? 'N/A') ?></td>
+                <td><?= h($beverage['type'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Tamanho</th>
-                <td><?= htmlspecialchars($beverage['size'] ?? 'N/A') ?></td>
+                <td><?= h($beverage['size'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Preparação</th>
                 <td>
                     <?php if (!empty($preparation_array)): ?>
                         <?php foreach ($preparation_array as $prep): ?>
-                            <span class="badge bg-info me-1"><?= htmlspecialchars(ucfirst($prep)) ?></span>
+                            <span class="badge bg-info me-1"><?= h(ucfirst($prep)) ?></span>
                         <?php endforeach; ?>
                     <?php else: ?>
                         N/A
@@ -82,7 +82,7 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
             </tr>
             <tr>
                 <th>Descrição</th>
-                <td><?= htmlspecialchars($beverage['description'] ?? 'N/A') ?></td>
+                <td><?= h($beverage['description'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Estado</th>
@@ -98,20 +98,20 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
         
         <div class="mt-4">
             <form method="POST" action="edit.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($beverage['id']) ?>">
+                <input type="hidden" name="id" value="<?= h($beverage['id']) ?>">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-edit"></i> Editar
                 </button>
             </form>
             
             <form method="POST" action="delete.php" style="display: inline;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($beverage['id']) ?>">
+                <input type="hidden" name="id" value="<?= h($beverage['id']) ?>">
                 <button type="submit" class="btn btn-danger">
                     <i class="fas fa-trash"></i> Apagar
                 </button>
             </form>
             
-            <a href="browse.php" class="btn btn-secondary">
+            <a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Voltar
             </a>
         </div>

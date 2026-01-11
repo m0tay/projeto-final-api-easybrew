@@ -90,13 +90,13 @@ if (!$user) {
 <h1 class="mt-4">Editar Utilizador</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Utilizadores</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/users/browse.php">Utilizadores</a></li>
     <li class="breadcrumb-item active">Editar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -104,11 +104,11 @@ if (!$user) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-user-edit me-1"></i>
-        Editar Utilizador #<?= htmlspecialchars($user['id']) ?>
+        Editar Utilizador #<?= h($user['id']) ?>
     </div>
     <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($user['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($user['id']) ?>">
             
             <div class="mb-4">
                 <label class="form-label">Avatar</label>
@@ -129,14 +129,14 @@ if (!$user) {
                     <div class="mb-3">
                         <label for="first_name" class="form-label">Primeiro Nome *</label>
                         <input type="text" class="form-control" id="first_name" name="first_name" 
-                               value="<?= htmlspecialchars($user['first_name']) ?>" required>
+                               value="<?= h($user['first_name']) ?>" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="last_name" class="form-label">Último Nome *</label>
                         <input type="text" class="form-control" id="last_name" name="last_name" 
-                               value="<?= htmlspecialchars($user['last_name']) ?>" required>
+                               value="<?= h($user['last_name']) ?>" required>
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@ if (!$user) {
             <div class="mb-3">
                 <label for="email" class="form-label">Email *</label>
                 <input type="email" class="form-control" id="email" name="email" 
-                       value="<?= htmlspecialchars($user['email']) ?>" required>
+                       value="<?= h($user['email']) ?>" required>
             </div>
             
             <div class="mb-3">
@@ -168,7 +168,7 @@ if (!$user) {
                     <div class="mb-3">
                         <label for="balance" class="form-label">Saldo (€) *</label>
                         <input type="number" class="form-control" id="balance" name="balance" 
-                               value="<?= htmlspecialchars($user['balance']) ?>" 
+                               value="<?= h($user['balance']) ?>" 
                                step="0.01" min="0" required>
                     </div>
                 </div>
@@ -187,7 +187,7 @@ if (!$user) {
                 <button type="submit" name="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Atualizar
                 </button>
-                <a href="browse.php" class="btn btn-secondary">
+                <a href="<?= ADMIN_BASE_PATH ?>/users/browse.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>

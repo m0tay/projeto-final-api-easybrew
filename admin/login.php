@@ -96,7 +96,7 @@ if (filter_input(INPUT_GET, 'sucesso') !== null) {
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <title>Login - EasyBrew Admin</title>
-        <link href="css/styles.css" rel="stylesheet" />
+        <link href="<?= ADMIN_BASE_PATH ?>/css/styles.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
     </head>
     <body class="bg-primary">
@@ -110,10 +110,10 @@ if (filter_input(INPUT_GET, 'sucesso') !== null) {
                                     <div class="card-header"><h3 class="text-center font-weight-light my-4">EasyBrew Admin</h3></div>
                                     <div class="card-body">
                                         <?php if ($error): ?>
-                                            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+                                            <div class="alert alert-danger"><?= h($error) ?></div>
                                         <?php endif; ?>
                                         <?php if ($success): ?>
-                                            <div class="alert alert-success"><?= htmlspecialchars($success) ?></div>
+                                            <div class="alert alert-success"><?= h($success) ?></div>
                                         <?php endif; ?>
                                         <form method="POST">
                                             <div class="form-floating mb-3">
@@ -140,6 +140,6 @@ if (filter_input(INPUT_GET, 'sucesso') !== null) {
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-        <script src="js/scripts.js"></script>
+        <script src="<?= ADMIN_BASE_PATH ?>/js/scripts.js"></script>
     </body>
 </html>

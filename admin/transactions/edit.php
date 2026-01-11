@@ -45,13 +45,13 @@ if (!$transaction) {
 <h1 class="mt-4">Editar Transação</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Transações</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php">Transações</a></li>
     <li class="breadcrumb-item active">Editar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -59,7 +59,7 @@ if (!$transaction) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-edit me-1"></i>
-        Editar Transação #<?= htmlspecialchars($transaction['id']) ?>
+        Editar Transação #<?= h($transaction['id']) ?>
     </div>
     <div class="card-body">
         <div class="alert alert-info">
@@ -68,33 +68,33 @@ if (!$transaction) {
         </div>
         
         <form method="POST">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($transaction['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($transaction['id']) ?>">
             
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Utilizador</label>
-                        <input type="text" class="form-control" value="ID: <?= htmlspecialchars($transaction['user_id']) ?>" disabled>
+                        <input type="text" class="form-control" value="ID: <?= h($transaction['user_id']) ?>" disabled>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Máquina</label>
-                        <input type="text" class="form-control" value="ID: <?= htmlspecialchars($transaction['machine_id']) ?>" disabled>
+                        <input type="text" class="form-control" value="ID: <?= h($transaction['machine_id']) ?>" disabled>
                     </div>
                 </div>
             </div>
             
             <div class="mb-3">
                 <label class="form-label">Nome da Bebida</label>
-                <input type="text" class="form-control" value="<?= htmlspecialchars($transaction['beverage_name']) ?>" disabled>
+                <input type="text" class="form-control" value="<?= h($transaction['beverage_name']) ?>" disabled>
             </div>
             
             <div class="row">
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label class="form-label">Preparação</label>
-                        <input type="text" class="form-control" value="<?= htmlspecialchars($transaction['preparation_chosen']) ?>" disabled>
+                        <input type="text" class="form-control" value="<?= h($transaction['preparation_chosen']) ?>" disabled>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -134,7 +134,7 @@ if (!$transaction) {
                 <button type="submit" name="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Atualizar
                 </button>
-                <a href="browse.php" class="btn btn-secondary">
+                <a href="<?= ADMIN_BASE_PATH ?>/transactions/browse.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>

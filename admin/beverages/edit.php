@@ -92,13 +92,13 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
 <h1 class="mt-4">Editar Bebida</h1>
 <ol class="breadcrumb mb-4">
     <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/index.php">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="browse.php">Bebidas</a></li>
+    <li class="breadcrumb-item"><a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php">Bebidas</a></li>
     <li class="breadcrumb-item active">Editar</li>
 </ol>
 
 <?php if ($error): ?>
     <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        <?= htmlspecialchars($error) ?>
+        <?= h($error) ?>
         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
     </div>
 <?php endif; ?>
@@ -106,11 +106,11 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-coffee me-1"></i>
-        Editar Bebida #<?= htmlspecialchars($beverage['id']) ?>
+        Editar Bebida #<?= h($beverage['id']) ?>
     </div>
     <div class="card-body">
         <form method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="id" value="<?= htmlspecialchars($beverage['id']) ?>">
+            <input type="hidden" name="id" value="<?= h($beverage['id']) ?>">
             
             <div class="mb-4">
                 <label class="form-label">Imagem</label>
@@ -131,14 +131,14 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
                     <div class="mb-3">
                         <label for="name" class="form-label">Nome *</label>
                         <input type="text" class="form-control" id="name" name="name" 
-                               value="<?= htmlspecialchars($beverage['name']) ?>" required>
+                               value="<?= h($beverage['name']) ?>" required>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="price" class="form-label">Preço (€) *</label>
                         <input type="number" class="form-control" id="price" name="price" 
-                               value="<?= htmlspecialchars($beverage['price']) ?>" 
+                               value="<?= h($beverage['price']) ?>" 
                                step="0.01" min="0" required>
                     </div>
                 </div>
@@ -149,14 +149,14 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
                     <div class="mb-3">
                         <label for="type" class="form-label">Tipo</label>
                         <input type="text" class="form-control" id="type" name="type" 
-                               value="<?= htmlspecialchars($beverage['type'] ?? '') ?>">
+                               value="<?= h($beverage['type'] ?? '') ?>">
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="mb-3">
                         <label for="size" class="form-label">Tamanho</label>
                         <input type="text" class="form-control" id="size" name="size" 
-                               value="<?= htmlspecialchars($beverage['size'] ?? '') ?>">
+                               value="<?= h($beverage['size'] ?? '') ?>">
                     </div>
                 </div>
             </div>
@@ -187,7 +187,7 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
             
             <div class="mb-3">
                 <label for="description" class="form-label">Descrição</label>
-                <textarea class="form-control" id="description" name="description" rows="3"><?= htmlspecialchars($beverage['description'] ?? '') ?></textarea>
+                <textarea class="form-control" id="description" name="description" rows="3"><?= h($beverage['description'] ?? '') ?></textarea>
             </div>
             
             <div class="mb-3">
@@ -202,7 +202,7 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
                 <button type="submit" name="submit" class="btn btn-primary">
                     <i class="fas fa-save"></i> Atualizar
                 </button>
-                <a href="browse.php" class="btn btn-secondary">
+                <a href="<?= ADMIN_BASE_PATH ?>/beverages/browse.php" class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancelar
                 </a>
             </div>
