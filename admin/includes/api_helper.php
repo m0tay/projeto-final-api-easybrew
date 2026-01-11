@@ -4,6 +4,10 @@ if (!defined('ADMIN_BASE_PATH')) {
     define('ADMIN_BASE_PATH', '/tesp-ds-g24/projeto/admin');
 }
 
+function h($value) {
+    return htmlspecialchars((string)($value ?? ''), ENT_QUOTES, 'UTF-8');
+}
+
 function callAPI($endpoint, $data = []) {
     if (isset($_SESSION['jwt'])) {
         $data['jwt'] = $_SESSION['jwt'];
@@ -60,6 +64,6 @@ function getUser() {
 
 function showAlert($message, $type = 'danger') {
     return '<div class="alert alert-' . $type . ' alert-dismissible fade show" role="alert">' 
-           . htmlspecialchars($message) 
+           . h($message) 
            . '<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>';
 }
