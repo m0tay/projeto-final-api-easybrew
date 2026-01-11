@@ -13,6 +13,7 @@ use \Firebase\JWT\Key;
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
+$response = [];
 $keywords = isset($data->keywords) ? $data->keywords : '';
 
 if ($jwt) {

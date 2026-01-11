@@ -13,6 +13,7 @@ $machine = new Machine($pdo);
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
+$response = [];
 $machine_id = isset($data->machine_id) ? filter_var($data->machine_id, FILTER_SANITIZE_SPECIAL_CHARS) : '';
 
 if ($jwt) {

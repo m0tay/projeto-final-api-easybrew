@@ -13,6 +13,7 @@ use \Firebase\JWT\Key;
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
+$response = [];
 
 if ($jwt) {
   try {
@@ -23,12 +24,6 @@ if ($jwt) {
       $response = ['message' => 'Acesso negado: Permissões insuficientes'];
     } else {
       $code = 200;
-      $response = [
-        'message' => 'Acesso autorizado',
-        'data' => $decoded->data,
-        'expiration' => date('c', $decoded->exp),
-        'timeleft' => $decoded->exp - time(),
-      ];
       $users = $user->browse();
 
       if ($users->rowCount() > 0) {
@@ -39,6 +34,7 @@ if ($jwt) {
           $records[] = $row;
         }
         $response['records'] = $records;
+        $response['message'] = 'Utilizadores obtidos com sucesso';
       } else {
         $code = 404;
         $response['message'] = 'Sem registros';

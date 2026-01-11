@@ -17,6 +17,7 @@ $transaction = new Transaction($pdo);
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
+$response = [];
 $machine_id = isset($data->machine_id) ? filter_var($data->machine_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 $user_id = isset($data->user_id) ? filter_var($data->user_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
 $beverage_id = isset($data->beverage_id) ? filter_var($data->beverage_id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';

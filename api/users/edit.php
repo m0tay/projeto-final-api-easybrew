@@ -11,6 +11,7 @@ $pdo = connectDB($db);
 $user = new User($pdo);
 $data = json_decode(file_get_contents('php://input'));
 $jwt = isset($data->jwt) ? $data->jwt : "";
+$response = [];
 
 if ($jwt) {
   try {

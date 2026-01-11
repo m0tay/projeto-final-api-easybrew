@@ -13,6 +13,7 @@ use \Firebase\JWT\Key;
 $data = json_decode(file_get_contents('php://input'));
 
 $jwt = isset($data->jwt) ? $data->jwt : '';
+$response = [];
 
 if ($jwt) {
   try {
@@ -30,10 +31,11 @@ if ($jwt) {
         while ($row = $beverages->fetch(PDO::FETCH_ASSOC)) {
           $records[] = $row;
         }
-        $response = ['message' => 'Bebidas encontradas', 'records' => $records];
+        $response['records'] = $records;
+        $response['message'] = 'Bebidas encontradas';
       } else {
         $code = 404;
-        $response = ['message' => 'Sem bebidas'];
+        $response['message'] = 'Sem bebidas';
       }
     }
   } catch (Exception $e) {
