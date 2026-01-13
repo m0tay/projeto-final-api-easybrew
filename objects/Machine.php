@@ -5,7 +5,7 @@ class Machine implements BREAD
 {
   private $conn;
   private $table_name = 'machines';
-  
+
   public $id;
   public $machine_code;
   public $location_name;
@@ -51,11 +51,14 @@ class Machine implements BREAD
     // Gerar UUID v4
     $this->id = sprintf(
       '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
       mt_rand(0, 0xffff),
       mt_rand(0, 0x0fff) | 0x4000,
       mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff)
     );
 
     $query = "INSERT INTO " . $this->table_name . "

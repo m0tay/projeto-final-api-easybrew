@@ -19,7 +19,7 @@ $keywords = isset($data->keywords) ? $data->keywords : '';
 if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
-    
+
     if ($decoded->data->role !== 'admin') {
       $code = 403;
       $response = ['message' => 'Acesso negado: Permissões insuficientes'];

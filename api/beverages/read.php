@@ -25,7 +25,7 @@ if ($jwt) {
       $response = ['message' => 'ID da bebida não fornecido'];
     } else {
       $beverage->id = $beverage_id;
-      
+
       if ($beverage->read()) {
         $code = 200;
         $response = [

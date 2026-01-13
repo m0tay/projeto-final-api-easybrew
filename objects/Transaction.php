@@ -6,7 +6,7 @@ class Transaction implements BREAD
 
   private $conn;
   private $table_name = 'transactions';
-  
+
   public $id;
   public $user_id;
   public $machine_id;
@@ -93,19 +93,23 @@ class Transaction implements BREAD
       $this->created_at = $row['created_at'];
       return true;
     }
-    
+
     return false;
   }
   public function add()
   {
-    // Gerar UUID v4
+    // Gerar UUID v4 https://stackoverflow.com/questions/33709709/what-is-the-best-way-to-generate-a-non-duplicate-uuid-v4-in-php?utm_source=chatgpt.com
+    // mudar para https://github.com/ramsey/uuid ?
     $this->id = sprintf(
       '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
       mt_rand(0, 0xffff),
       mt_rand(0, 0x0fff) | 0x4000,
       mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff)
     );
 
     $query = 'INSERT INTO ' . $this->table_name . '

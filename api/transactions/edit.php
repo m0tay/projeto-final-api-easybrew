@@ -25,30 +25,30 @@ if ($jwt) {
     } else {
       if (!empty($data)) {
         $transaction_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
-        
+
         if (empty($transaction_id)) {
           $code = 400;
           $response = ['message' => 'ID da transação não fornecido'];
         } else {
           $transaction->id = $transaction_id;
           $transaction->read();
-          
+
           if ($transaction->user_id == null) {
             $code = 404;
             $response = ['message' => 'Transação não encontrada'];
           } else {
             $transaction->type = isset($data->type) ? filter_var($data->type, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $transaction->type;
             $transaction->status = isset($data->status) ? filter_var($data->status, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $transaction->status;
-            
+
             $error = '';
-            
+
             if (!in_array($transaction->type, ['purchase', 'deposit', 'refund'])) {
               $error .= 'Tipo de transação inválido. ';
             }
             if (!in_array($transaction->status, ['completed', 'failed', 'refunded'])) {
               $error .= 'Status inválido. ';
             }
-            
+
             if ($error == '') {
               if ($transaction->edit()) {
                 $code = 200;

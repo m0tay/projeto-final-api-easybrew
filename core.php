@@ -18,10 +18,10 @@ function connectDB($db)
   } catch (PDOException $e) {
     die('Erro ao ligar ao servidor ' . $e->getMessage());
   }
-  
+
   $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
   $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-  
+
   return $pdo;
 }
 
@@ -80,12 +80,12 @@ function get_path_id()
   if (empty($pathinfo)) {
     return null;
   }
-  
+
   $patharray = explode("/", $pathinfo);
   if (!empty($patharray) && isset($patharray[2]) && filter_var($patharray[2], FILTER_VALIDATE_INT)) {
     return (int)$patharray[2];
   }
-  
+
   return null;
 }
 
@@ -130,13 +130,13 @@ function delete_dir($path)
   if (!is_dir($path)) {
     return false;
   }
-  
+
   $files = array_diff(scandir($path), ['.', '..']);
   foreach ($files as $file) {
     $filepath = $path . DIRECTORY_SEPARATOR . $file;
     is_dir($filepath) ? delete_dir($filepath) : unlink($filepath);
   }
-  
+
   return rmdir($path);
 }
 

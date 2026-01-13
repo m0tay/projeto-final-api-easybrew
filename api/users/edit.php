@@ -16,9 +16,9 @@ $response = [];
 if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
-    
+
     $target_user_id = isset($data->id) ? filter_var($data->id, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : $decoded->data->id;
-    
+
     if ($decoded->data->id != $target_user_id && $decoded->data->role !== 'admin') {
       $code = 403;
       $response = ['message' => 'Acesso negado: Permissões insuficientes'];
@@ -29,10 +29,10 @@ if ($jwt) {
       $user->email = isset($data->email) ? filter_var($data->email, FILTER_VALIDATE_EMAIL) : '';
       $user->password_hash = isset($data->password) ? $data->password : '';
       $user->avatar = isset($data->avatar) ? filter_var($data->avatar, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : '';
-      
+
       $is_admin = $decoded->data->role === 'admin';
       $has_admin_fields = isset($data->role) || isset($data->balance) || isset($data->is_active);
-      
+
       if ($has_admin_fields && !$is_admin) {
         $code = 403;
         $response = ['message' => 'Acesso negado: Não pode modificar role, balance ou is_active'];
@@ -45,17 +45,17 @@ if ($jwt) {
             $user->role = isset($data->role) ? filter_var($data->role, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : null;
             $user->balance = isset($data->balance) ? filter_var($data->balance, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : null;
             $user->is_active = isset($data->is_active) ? filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null;
-            
+
             $update_result = $user->adminEdit();
           } else {
             $update_result = $user->edit();
           }
-          
+
           if ($update_result) {
             // user editou a si mesmo, precisa gerar novo token
             if ($decoded->data->id == $target_user_id) {
               $new_role = ($is_admin && isset($data->role)) ? $user->role : $decoded->data->role;
-              
+
               $token = [
                 "iss" => $jwt_conf['iss'],
                 "jti" => $jwt_conf['jti'],

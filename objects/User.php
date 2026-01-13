@@ -5,7 +5,7 @@ class User implements BREAD
 {
   private $conn;
   private $table_name = "users";
-  
+
   public $id;
   public $email;
   public $first_name;
@@ -73,11 +73,14 @@ class User implements BREAD
     // Gerar UUID v4
     $this->id = sprintf(
       '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
       mt_rand(0, 0xffff),
       mt_rand(0, 0x0fff) | 0x4000,
       mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff)
     );
 
     $query = "INSERT INTO " . $this->table_name . "
@@ -92,9 +95,9 @@ class User implements BREAD
       email_verified = 0,
       email_verification_token = :token,
       email_verification_expires = :expires";
-      
+
     $stmt = $this->conn->prepare($query);
-    
+
     $stmt->bindValue(':id', $this->id);
     $this->email = filter_var($this->email, FILTER_SANITIZE_EMAIL);
 
@@ -153,7 +156,7 @@ class User implements BREAD
     if (!empty($this->password_hash)) {
       $stmt->bindValue(':password_hash', password_hash($this->password_hash, PASSWORD_DEFAULT));
     }
-    
+
     if (!empty($this->avatar)) {
       $stmt->bindValue(':avatar', $this->avatar);
     }
@@ -209,7 +212,7 @@ class User implements BREAD
     if (!empty($this->password_hash)) {
       $stmt->bindValue(':password_hash', password_hash($this->password_hash, PASSWORD_DEFAULT));
     }
-    
+
     if (!empty($this->avatar)) {
       $stmt->bindValue(':avatar', $this->avatar);
     }

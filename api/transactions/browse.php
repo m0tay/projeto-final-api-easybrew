@@ -20,7 +20,7 @@ if ($jwt) {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
 
     $is_admin = $decoded->data->role === 'admin';
-    
+
     if ($is_admin) {
       $transactions = $transaction->browse();
     } else {

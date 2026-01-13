@@ -5,7 +5,7 @@ class Beverage implements BREAD
 {
   private $conn;
   private $table_name = 'beverages';
-  
+
   public $id;
   public $name;
   public $type;
@@ -37,9 +37,9 @@ class Beverage implements BREAD
     $stmt->execute();
 
     $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    
+
     if (!$row) {
-      $this->id = null; 
+      $this->id = null;
       return false;
     }
 
@@ -51,7 +51,7 @@ class Beverage implements BREAD
     $this->image = $row['image'];
     $this->price = $row['price'];
     $this->is_active = boolval($row['is_active']);
-    
+
     return true;
   }
 
@@ -60,11 +60,14 @@ class Beverage implements BREAD
     // Gerar UUID v4
     $this->id = sprintf(
       '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
       mt_rand(0, 0xffff),
       mt_rand(0, 0x0fff) | 0x4000,
       mt_rand(0, 0x3fff) | 0x8000,
-      mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff),
+      mt_rand(0, 0xffff)
     );
 
     $query = 'INSERT INTO ' . $this->table_name . '

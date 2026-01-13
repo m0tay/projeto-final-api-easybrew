@@ -19,11 +19,11 @@ $response = [];
 if ($jwt) {
   try {
     $decoded = JWT::decode($jwt, new Key($jwt_conf['key'], $jwt_conf['alg']));
-    
+
     // Carregar dados atualizados do usuário do banco de dados
     $user->id = $decoded->data->id;
     $user->read();
-    
+
     // Verificar se o usuário ainda está ativo
     if (!boolval($user->is_active)) {
       $code = 403;
@@ -50,7 +50,7 @@ if ($jwt) {
         )
       );
       $new_jwt = JWT::encode($token, $jwt_conf['key'], $jwt_conf['alg']);
-      
+
       $code = 200;
       $response = [
         'message' => 'Acesso autorizado',
