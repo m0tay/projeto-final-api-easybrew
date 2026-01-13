@@ -1,5 +1,6 @@
 <?php
 require_once 'config.php';
+require_once 'admin/includes/api_helper.php';
 
 $success = '';
 $error = '';
