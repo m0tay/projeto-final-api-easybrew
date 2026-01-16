@@ -1,10 +1,8 @@
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
-    if (session_status() === PHP_SESSION_NONE) {
-        session_start();
-    }
     require_once __DIR__ . '/../../config.php';
     require_once __DIR__ . '/../../core.php';
+    session_start();
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $data = [
@@ -159,7 +157,7 @@ if (!$user) {
                     <div class="mb-3">
                         <label for="role" class="form-label">Função *</label>
                         <select class="form-select" id="role" name="role" required>
-                            <option value="customer" <?= $user['role'] === 'customer' ? 'selected' : '' ?>>Cliente</option>
+                            <option value="costumer" <?= $user['role'] === 'costumer' ? 'selected' : '' ?>>Cliente</option>
                             <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
                         </select>
                     </div>
