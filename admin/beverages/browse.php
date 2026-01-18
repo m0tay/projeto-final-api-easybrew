@@ -41,6 +41,7 @@ if (isset($result['message']) && empty($beverages)) {
         <table id="datatablesSimple">
             <thead>
                 <tr>
+                    <th>Imagem</th>
                     <th>ID</th>
                     <th>Nome</th>
                     <th>Tipo</th>
@@ -53,6 +54,13 @@ if (isset($result['message']) && empty($beverages)) {
             <tbody>
                 <?php foreach ($beverages as $beverage): ?>
                     <tr>
+                        <td>
+                            <img src="<?= get_beverage_image_url($beverage['image'] ?? '') ?>" 
+                                 alt="<?= h($beverage['name']) ?>" 
+                                 class="rounded" 
+                                 width="40" height="40" 
+                                 style="object-fit: cover;">
+                        </td>
                         <td><?= h(substr($beverage['id'] ?? '', 0, 8)) ?>...</td>
                         <td><?= h($beverage['name']) ?></td>
                         <td><?= h($beverage['type']) ?: '-' ?></td>

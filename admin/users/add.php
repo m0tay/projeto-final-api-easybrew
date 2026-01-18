@@ -1,21 +1,101 @@
 <?php
-require_once __DIR__ . '/../includes/header.php';
-
-$error = '';
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../core.php';
+    require_once __DIR__ . '/../includes/api_helper.php';
+    
     $result = callAPI('users/add.php', [
         'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
         'password' => filter_input(INPUT_POST, 'password')
     ]);
     
-    if (isset($result['http_code']) && $result['http_code'] == 200) {
-        header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
-        exit;
+    if (isset($result['http_code']) && ($result['http_code'] == 200 || $result['http_code'] == 201)) {
+        $user_id = $result['id'] ?? null;
+        
+        if ($user_id && isset($_FILES['avatar']) && $_FILES['avatar']['error'] === UPLOAD_ERR_OK) {
+            $upload_extension = strtolower(pathinfo($_FILES['avatar']['name'], PATHINFO_EXTENSION));
+            $upload_size = $_FILES['avatar']['size'];
+            $upload_tmp_name = $_FILES['avatar']['tmp_name'];
+            
+            $allowed_extensions = ['jpg', 'jpeg', 'png'];
+            $max_size = 2 * 1024 * 1024;
+            
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $upload_tmp_name);
+            finfo_close($finfo);
+            
+            $allowed_mimes = ['image/jpeg', 'image/png'];
+            
+            if (!in_array($upload_extension, $allowed_extensions)) {
+                $error = 'Formato de imagem não permitido. Use JPG ou PNG.';
+            } elseif ($upload_size > $max_size) {
+                $error = 'Imagem muito grande. Máximo 2MB.';
+            } elseif (!in_array($mime, $allowed_mimes)) {
+                $error = 'Tipo de arquivo inválido.';
+            } else {
+                $avatar_filename = $user_id . '-img.' . $upload_extension;
+                $avatar_path = AVATAR_PATH . $avatar_filename;
+                
+                create_dir(AVATAR_PATH);
+                
+                $source_image = match($upload_extension) {
+                    'jpg', 'jpeg' => @imagecreatefromjpeg($upload_tmp_name),
+                    'png' => @imagecreatefrompng($upload_tmp_name),
+                };
+                
+                if ($source_image) {
+                    $original_width = imagesx($source_image);
+                    $original_height = imagesy($source_image);
+                    
+                    $new_image = imagecreatetruecolor(256, 256);
+                    
+                    if ($upload_extension === 'png') {
+                        imagealphablending($new_image, false);
+                        imagesavealpha($new_image, true);
+                        $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
+                        imagefill($new_image, 0, 0, $transparent);
+                    }
+                    
+                    imagecopyresampled($new_image, $source_image, 0, 0, 0, 0, 256, 256, $original_width, $original_height);
+                    
+                    $save_success = match($upload_extension) {
+                        'jpg', 'jpeg' => imagejpeg($new_image, $avatar_path, 85),
+                        'png' => imagepng($new_image, $avatar_path, 6),
+                    };
+                    
+                    imagedestroy($source_image);
+                    imagedestroy($new_image);
+                    
+                    if ($save_success) {
+                        $user = callAPI('users/read.php', ['id' => $user_id]);
+                        callAPI('users/edit.php', [
+                            'id' => $user_id,
+                            'first_name' => $user['first_name'],
+                            'last_name' => $user['last_name'],
+                            'email' => $user['email'],
+                            'role' => $user['role'],
+                            'balance' => $user['balance'],
+                            'is_active' => $user['is_active'],
+                            'avatar' => $avatar_filename
+                        ]);
+                    }
+                }
+            }
+        }
+        
+        if (!isset($error)) {
+            header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
+            exit;
+        }
     } else {
         $error = $result['message'] ?? 'Erro ao criar utilizador';
     }
 }
+
+require_once __DIR__ . '/../includes/header.php';
+
+$error = $error ?? '';
+?>
 ?>
 
 <h1 class="mt-4">Adicionar Utilizador</h1>
@@ -38,33 +118,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Novo Utilizador
     </div>
     <div class="card-body">
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i>
-            O nome será gerado automaticamente a partir do email. Por exemplo, <strong>joao.silva@email.com</strong> gerará o nome <strong>Joao Silva</strong>.
-        </div>
-        
-        <form method="POST">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="avatar" class="form-label">Avatar</label>
+                <input type="file" class="form-control" id="avatar" name="avatar" 
+                       accept="image/jpeg,image/png">
+            </div>
+            
             <div class="mb-3">
                 <label for="email" class="form-label">Email *</label>
                 <input type="email" class="form-control" id="email" name="email" 
                        placeholder="utilizador@exemplo.com" required>
-                <div class="form-text">O utilizador usará este email para fazer login.</div>
             </div>
             <div class="mb-3">
                 <label for="password" class="form-label">Password *</label>
                 <input type="password" class="form-control" id="password" name="password" 
                        minlength="6" required>
-                <div class="form-text">Mínimo 6 caracteres.</div>
-            </div>
-            
-            <div class="alert alert-warning">
-                <strong>Nota:</strong> O utilizador será criado com:
-                <ul class="mb-0 mt-2">
-                    <li>Função: <strong>Cliente</strong></li>
-                    <li>Saldo: <strong>€0,00</strong></li>
-                    <li>Estado: <strong>Ativo</strong></li>
-                </ul>
-                <div class="mt-2">Use a opção "Editar" para modificar estes valores após criação.</div>
             </div>
             
             <div class="mt-4">

@@ -74,19 +74,19 @@ define('WEB_ROOT', '/tesp-ds-g24/projeto/');
  */
 define('SERVER_FILE_ROOT', '//arca.ua.pt/Hosting/esan-tesp-ds-paw.web.ua.pt' . WEB_ROOT);
 define('UPLOAD_FOLDER', 'uploads/');
-define('UPLOAD_PATH', SERVER_FILE_ROOT . UPLOAD_FOLDER);
+define('UPLOAD_PATH', '//arca.ua.pt/Hosting/esan-tesp-ds-paw.web.ua.pt/tesp-ds-g24/' . UPLOAD_FOLDER);
 
 define('AVATAR_FOLDER', UPLOAD_FOLDER . 'avatar/');
-define('AVATAR_PATH', SERVER_FILE_ROOT . AVATAR_FOLDER);
-define('AVATAR_WEB_PATH', WEB_ROOT . AVATAR_FOLDER);
+define('AVATAR_PATH', UPLOAD_PATH . 'avatar/');
+define('AVATAR_WEB_PATH', '/tesp-ds-g24/' . UPLOAD_FOLDER . 'avatar/');
 define('AVATAR_DEFAULT', 'avatar.png');
 
 define('BEVERAGE_FOLDER', UPLOAD_FOLDER . 'beverages/');
-define('BEVERAGE_PATH', SERVER_FILE_ROOT . BEVERAGE_FOLDER);
-define('BEVERAGE_WEB_PATH', WEB_ROOT . BEVERAGE_FOLDER);
+define('BEVERAGE_PATH', UPLOAD_PATH . 'beverages/');
+define('BEVERAGE_WEB_PATH', '/tesp-ds-g24/' . UPLOAD_FOLDER . 'beverages/');
 define('BEVERAGE_DEFAULT', 'beverage.png');
 
-define('ATTACHMENTS_PATH', SERVER_FILE_ROOT . UPLOAD_FOLDER . 'attach/');
+define('ATTACHMENTS_PATH', UPLOAD_PATH . 'attach/');
 
 /* * * * * * * * * *
  * D E B U G

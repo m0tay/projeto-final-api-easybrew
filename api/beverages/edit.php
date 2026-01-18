@@ -32,7 +32,7 @@ if ($jwt) {
         $beverage->price = isset($data->price) ? $data->price : 0;
         $beverage->description = isset($data->description) ? $data->description : '';
         $beverage->image = isset($data->image) ? $data->image : '';
-        $beverage->is_active = isset($data->is_active) ? filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : 1;
+        $beverage->is_active = isset($data->is_active) ? (int)$data->is_active : 1;
 
         if (empty($beverage->id) || empty($beverage->name)) {
           $code = 400;

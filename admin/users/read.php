@@ -37,7 +37,7 @@ if (!$user) {
 <div class="card mb-4">
     <div class="card-header">
         <i class="fas fa-user me-1"></i>
-        Utilizador #<?= h($user['id']) ?? "N/A" ?>
+        Utilizador #<?= h($user['id'] ?? 'N/A') ?>
     </div>
     <div class="card-body">
         <div class="mb-3 text-center">
@@ -48,19 +48,19 @@ if (!$user) {
         <table class="table table-bordered">
             <tr>
                 <th style="width: 200px;">ID</th>
-                <td><?= h($user['id']) ?? "N/A" ?></td>
+                <td><?= h($user['id'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Primeiro Nome</th>
-                <td><?= h($user['first_name']) ?? "N/A" ?></td>
+                <td><?= h($user['first_name'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Último Nome</th>
-                <td><?= h($user['last_name']) ?? "N/A" ?></td>
+                <td><?= h($user['last_name'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Email</th>
-                <td><?= h($user['email']) ?? "N/A" ?></td>
+                <td><?= h($user['email'] ?? 'N/A') ?></td>
             </tr>
             <tr>
                 <th>Função</th>
@@ -74,7 +74,7 @@ if (!$user) {
             </tr>
             <tr>
                 <th>Saldo</th>
-                <td>€<?= number_format($user['balance'], 2, ',', '.') ?? "N/A" ?></td>
+                <td><?= isset($user['balance']) ? '€' . number_format($user['balance'], 2, ',', '.') : 'N/A' ?></td>
             </tr>
             <tr>
                 <th>Estado</th>
@@ -88,11 +88,11 @@ if (!$user) {
             </tr>
             <tr>
                 <th>Criado em</th>
-                <td><?= date('d/m/Y H:i', strtotime($user['created_at'])) ?></td>
+                <td><?= isset($user['created_at']) ? date('d/m/Y H:i', strtotime($user['created_at'])) : 'N/A' ?></td>
             </tr>
             <tr>
                 <th>Atualizado em</th>
-                <td><?= date('d/m/Y H:i', strtotime($user['updated_at'])) ?? "N/A" ?></td>
+                <td><?= isset($user['updated_at']) ? date('d/m/Y H:i', strtotime($user['updated_at'])) : 'N/A' ?></td>
             </tr>
         </table>
         

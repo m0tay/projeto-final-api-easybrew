@@ -4,9 +4,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm')
         session_start();
     }
     require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../core.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
-    $result = callAPI('beverages/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);
+    $beverage_id = filter_input(INPUT_POST, 'id');
+    $beverage = callAPI('beverages/read.php', ['id' => $beverage_id]);
+    
+    if (!empty($beverage['image'])) {
+        delete_file(BEVERAGE_PATH . $beverage['image']);
+    }
+    
+    $result = callAPI('beverages/delete.php', ['id' => $beverage_id]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
         header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');

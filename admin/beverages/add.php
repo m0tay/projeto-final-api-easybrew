@@ -16,53 +16,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $result = callAPI('beverages/add.php', $data);
     
-    if (isset($result['http_code']) && $result['http_code'] == 200) {
-        $beverage_id = $result['id'];
+    if (isset($result['http_code']) && ($result['http_code'] == 200 || $result['http_code'] == 201)) {
+        $beverage_id = $result['id'] ?? null;
         
-        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-            $upload_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
-            $upload_size = $_FILES['image']['size'];
-            $upload_tmp_name = $_FILES['image']['tmp_name'];
-            
-            $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-            $max_size = 2 * 1024 * 1024;
-            
-            if (!in_array($upload_extension, $allowed_extensions)) {
-                $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
-            } elseif ($upload_size > $max_size) {
-                $error = 'Imagem muito grande. Máximo 2MB.';
-            } else {
-                $image_filename = 'beverage_' . $beverage_id . '_' . time() . '.' . $upload_extension;
-                $image_path = BEVERAGE_PATH . $image_filename;
-                
-                create_dir(BEVERAGE_PATH);
-                
-                if (move_uploaded_file($upload_tmp_name, $image_path)) {
-                    $update_result = callAPI('beverages/edit.php', [
-                        'id' => $beverage_id,
-                        'name' => $data['name'],
-                        'type' => $data['type'],
-                        'size' => $data['size'],
-                        'preparation' => $data['preparation'],
-                        'price' => $data['price'],
-                        'description' => $data['description'],
-                        'image' => $image_filename,
-                        'is_active' => 1
-                    ]);
-                    
-                    if (isset($update_result['http_code']) && $update_result['http_code'] == 200) {
-                        header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');
-                        exit;
-                    } else {
-                        $error = 'Bebida criada mas erro ao salvar imagem: ' . ($update_result['message'] ?? 'Erro desconhecido');
-                    }
-                } else {
-                    $error = 'Erro ao fazer upload da imagem.';
-                }
-            }
+        if (!$beverage_id) {
+            $error = 'Erro: ID da bebida não retornado pela API';
         } else {
-            header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');
-            exit;
+            if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+                $upload_extension = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
+                $upload_size = $_FILES['image']['size'];
+                $upload_tmp_name = $_FILES['image']['tmp_name'];
+                
+                $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+                $max_size = 2 * 1024 * 1024;
+                
+                $finfo = finfo_open(FILEINFO_MIME_TYPE);
+                $mime = finfo_file($finfo, $upload_tmp_name);
+                finfo_close($finfo);
+                
+                $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif'];
+                
+                if (!in_array($upload_extension, $allowed_extensions)) {
+                    $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
+                } elseif ($upload_size > $max_size) {
+                    $error = 'Imagem muito grande. Máximo 2MB.';
+                } elseif (!in_array($mime, $allowed_mimes)) {
+                    $error = 'Tipo de arquivo inválido.';
+                } else {
+                    $image_filename = 'beverage_' . $beverage_id . '_' . time() . '.' . $upload_extension;
+                    $image_path = BEVERAGE_PATH . $image_filename;
+                    
+                    create_dir(BEVERAGE_PATH);
+                    
+                    if (move_uploaded_file($upload_tmp_name, $image_path)) {
+                        $update_result = callAPI('beverages/edit.php', [
+                            'id' => $beverage_id,
+                            'name' => $data['name'],
+                            'type' => $data['type'],
+                            'size' => $data['size'],
+                            'preparation' => $data['preparation'],
+                            'price' => $data['price'],
+                            'description' => $data['description'],
+                            'image' => $image_filename,
+                            'is_active' => 1
+                        ]);
+                        
+                        if (isset($update_result['http_code']) && $update_result['http_code'] == 200) {
+                            header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');
+                            exit;
+                        } else {
+                            $error = 'Bebida criada mas erro ao salvar imagem: ' . ($update_result['message'] ?? 'Erro desconhecido');
+                        }
+                    } else {
+                        $error = 'Erro ao fazer upload da imagem. Verifique permissões do diretório.';
+                    }
+                }
+            } else {
+                header('Location: ' . ADMIN_BASE_PATH . '/beverages/browse.php');
+                exit;
+            }
         }
     } else {
         $error = $result['message'] ?? 'Erro ao criar bebida';
@@ -154,7 +166,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="mb-3">
                 <label for="image" class="form-label">Imagem</label>
                 <input type="file" class="form-control" id="image" name="image" accept="image/*">
-                <div class="form-text">Formatos permitidos: JPG, PNG, GIF. Máximo 2MB.</div>
             </div>
 
             <div class="mt-4">

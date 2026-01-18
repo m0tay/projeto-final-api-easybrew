@@ -2,8 +2,12 @@
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     require_once __DIR__ . '/../../config.php';
     require_once __DIR__ . '/../../core.php';
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     require_once __DIR__ . '/../includes/api_helper.php';
+    
+    $is_active_input = filter_input(INPUT_POST, 'is_active');
     
     $data = [
         'id' => filter_input(INPUT_POST, 'id'),
@@ -12,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
         'role' => filter_input(INPUT_POST, 'role'),
         'balance' => filter_input(INPUT_POST, 'balance', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-        'is_active' => filter_input(INPUT_POST, 'is_active')
+        'is_active' => (int)$is_active_input
     ];
     
     $password = filter_input(INPUT_POST, 'password');
@@ -25,28 +29,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         $upload_size = $_FILES['avatar']['size'];
         $upload_tmp_name = $_FILES['avatar']['tmp_name'];
         
-        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
-        $max_size = 2 * 1024 * 1024; // 2MB
+        $allowed_extensions = ['jpg', 'jpeg', 'png'];
+        $max_size = 2 * 1024 * 1024;
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $upload_tmp_name);
+        finfo_close($finfo);
+        
+        $allowed_mimes = ['image/jpeg', 'image/png'];
         
         if (!in_array($upload_extension, $allowed_extensions)) {
-            $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
+            $error = 'Formato de imagem não permitido. Use JPG ou PNG.';
         } elseif ($upload_size > $max_size) {
             $error = 'Imagem muito grande. Máximo 2MB.';
+        } elseif (!in_array($mime, $allowed_mimes)) {
+            $error = 'Tipo de arquivo inválido.';
         } else {
-            $avatar_filename = 'user_' . $data['id'] . '_' . time() . '.' . $upload_extension;
+            $avatar_filename = $data['id'] . '-img.' . $upload_extension;
             $avatar_path = AVATAR_PATH . $avatar_filename;
             
             create_dir(AVATAR_PATH);
             
-            if (move_uploaded_file($upload_tmp_name, $avatar_path)) {
-                $data['avatar'] = $avatar_filename;
+            $source_image = match($upload_extension) {
+                'jpg', 'jpeg' => @imagecreatefromjpeg($upload_tmp_name),
+                'png' => @imagecreatefrompng($upload_tmp_name),
+            };
+            
+            if ($source_image) {
+                $original_width = imagesx($source_image);
+                $original_height = imagesy($source_image);
                 
-                $old_user = callAPI('users/read.php', ['id' => $data['id']]);
-                if (!empty($old_user['avatar']) && file_exists(AVATAR_PATH . $old_user['avatar'])) {
-                    delete_file(AVATAR_PATH . $old_user['avatar']);
+                $new_image = imagecreatetruecolor(256, 256);
+                
+                if ($upload_extension === 'png') {
+                    imagealphablending($new_image, false);
+                    imagesavealpha($new_image, true);
+                    $transparent = imagecolorallocatealpha($new_image, 0, 0, 0, 127);
+                    imagefill($new_image, 0, 0, $transparent);
+                }
+                
+                imagecopyresampled($new_image, $source_image, 0, 0, 0, 0, 256, 256, $original_width, $original_height);
+                
+                $save_success = match($upload_extension) {
+                    'jpg', 'jpeg' => imagejpeg($new_image, $avatar_path, 85),
+                    'png' => imagepng($new_image, $avatar_path, 6),
+                };
+                
+                imagedestroy($source_image);
+                imagedestroy($new_image);
+                
+                if ($save_success) {
+                    $data['avatar'] = $avatar_filename;
+                    
+                    $old_user = callAPI('users/read.php', ['id' => $data['id']]);
+                    if (!empty($old_user['avatar']) && $old_user['avatar'] !== AVATAR_DEFAULT && file_exists(AVATAR_PATH . $old_user['avatar'])) {
+                        delete_file(AVATAR_PATH . $old_user['avatar']);
+                    }
+                } else {
+                    $error = 'Erro ao processar imagem.';
                 }
             } else {
-                $error = 'Erro ao fazer upload do avatar.';
+                $error = 'Erro ao ler imagem.';
             }
         }
     }
@@ -116,8 +159,8 @@ if (!$user) {
                          width="80" height="80" id="avatar-preview">
                     <div>
                         <input type="file" class="form-control" id="avatar" name="avatar" 
-                               accept="image/jpeg,image/png,image/gif">
-                        <div class="form-text">JPG, PNG ou GIF. Máximo 2MB.</div>
+                               accept="image/jpeg,image/png">
+                        <div class="form-text">JPG ou PNG. Máximo 2MB.</div>
                     </div>
                 </div>
             </div>
