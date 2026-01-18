@@ -29,6 +29,12 @@ if ($jwt) {
         $response = ['message' => 'ID não fornecido'];
       } else {
         $beverage->id = $id;
+        
+        if ($beverage->read()) {
+          if (!empty($beverage->image)) {
+            delete_file(BEVERAGE_PATH . $beverage->image);
+          }
+        }
 
         if ($beverage->delete()) {
           $code = 200;
