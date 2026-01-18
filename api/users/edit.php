@@ -44,7 +44,7 @@ if ($jwt) {
           if ($is_admin && $has_admin_fields) {
             $user->role = isset($data->role) ? filter_var($data->role, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : null;
             $user->balance = isset($data->balance) ? filter_var($data->balance, FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION) : null;
-            $user->is_active = isset($data->is_active) ? filter_var($data->is_active, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) : null;
+            $user->is_active = isset($data->is_active) ? (int)$data->is_active : null;
 
             $update_result = $user->adminEdit();
           } else {

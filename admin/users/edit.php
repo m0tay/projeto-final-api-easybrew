@@ -7,6 +7,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
     }
     require_once __DIR__ . '/../includes/api_helper.php';
     
+    $is_active_input = filter_input(INPUT_POST, 'is_active');
+    
     $data = [
         'id' => filter_input(INPUT_POST, 'id'),
         'first_name' => filter_input(INPUT_POST, 'first_name'),
@@ -14,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
         'role' => filter_input(INPUT_POST, 'role'),
         'balance' => filter_input(INPUT_POST, 'balance', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-        'is_active' => filter_input(INPUT_POST, 'is_active', FILTER_VALIDATE_INT) !== false ? filter_input(INPUT_POST, 'is_active', FILTER_VALIDATE_INT) : 1
+        'is_active' => (int)$is_active_input
     ];
     
     $password = filter_input(INPUT_POST, 'password');
