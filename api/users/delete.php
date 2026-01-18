@@ -29,6 +29,12 @@ if ($jwt) {
         $response = ['message' => 'ID do utilizador não fornecido'];
       } else {
         $user->id = $user_id;
+        
+        if ($user->read()) {
+          if (!empty($user->avatar) && $user->avatar !== AVATAR_DEFAULT) {
+            delete_file(AVATAR_PATH . $user->avatar);
+          }
+        }
 
         if ($user->delete()) {
           $code = 200;
