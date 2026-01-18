@@ -28,11 +28,16 @@ if ($jwt) {
 
       if (!$machine->read()) {
         $code = 404;
-        $response = ['message' => 'Máquina não encontrada'];
+        $response = ['message' => 'Máquina não encontrada', 'machine_id' => $machine_id];
       } else {
         if (!boolval($machine->is_active)) {
           $code = 403;
-          $response = ['message' => 'Máquina não está ativa'];
+          $response = [
+            'message' => 'Máquina não está ativa',
+            'machine_id' => $machine_id,
+            'machine_code' => $machine->machine_code,
+            'is_active' => $machine->is_active
+          ];
         } else {
           $menu_url = $machine->api_address . $machine->machine_code . '/api/menu.php';
           $host = parse_url($menu_url, PHP_URL_HOST);
@@ -54,7 +59,8 @@ if ($jwt) {
             $code = 503;
             $response = [
               'message' => 'Erro ao comunicar com a máquina',
-              'error' => $curl_error ?: 'HTTP ' . $http_code
+              'error' => $curl_error ?: 'HTTP ' . $http_code,
+              'machine_url' => $menu_url
             ];
           } else {
             $menu_data = json_decode($menu_response, true);
