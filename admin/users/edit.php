@@ -2,7 +2,9 @@
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') !== null) {
     require_once __DIR__ . '/../../config.php';
     require_once __DIR__ . '/../../core.php';
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $data = [
@@ -12,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         'email' => filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL),
         'role' => filter_input(INPUT_POST, 'role'),
         'balance' => filter_input(INPUT_POST, 'balance', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
-        'is_active' => filter_input(INPUT_POST, 'is_active')
+        'is_active' => filter_input(INPUT_POST, 'is_active', FILTER_VALIDATE_INT) !== false ? filter_input(INPUT_POST, 'is_active', FILTER_VALIDATE_INT) : 1
     ];
     
     $password = filter_input(INPUT_POST, 'password');
