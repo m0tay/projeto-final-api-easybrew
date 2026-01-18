@@ -29,10 +29,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
         $max_size = 2 * 1024 * 1024;
         
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $upload_tmp_name);
+        finfo_close($finfo);
+        
+        $allowed_mimes = ['image/jpeg', 'image/png', 'image/gif'];
+        
         if (!in_array($upload_extension, $allowed_extensions)) {
             $error = 'Formato de imagem não permitido. Use JPG, PNG ou GIF.';
         } elseif ($upload_size > $max_size) {
             $error = 'Imagem muito grande. Máximo 2MB.';
+        } elseif (!in_array($mime, $allowed_mimes)) {
+            $error = 'Tipo de arquivo inválido.';
         } else {
             $image_filename = 'beverage_' . $data['id'] . '_' . time() . '.' . $upload_extension;
             $image_path = BEVERAGE_PATH . $image_filename;
