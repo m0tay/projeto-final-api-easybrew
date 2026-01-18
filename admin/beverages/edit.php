@@ -8,6 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
     require_once __DIR__ . '/../includes/api_helper.php';
     
     $preparation = filter_input(INPUT_POST, 'preparation', FILTER_DEFAULT, FILTER_REQUIRE_ARRAY);
+    $is_active_input = filter_input(INPUT_POST, 'is_active');
+    
     $data = [
         'id' => filter_input(INPUT_POST, 'id'),
         'name' => filter_input(INPUT_POST, 'name'),
@@ -16,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         'preparation' => $preparation ? implode(',', $preparation) : null,
         'price' => filter_input(INPUT_POST, 'price', FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION),
         'description' => filter_input(INPUT_POST, 'description'),
-        'is_active' => filter_input(INPUT_POST, 'is_active')
+        'is_active' => (int)$is_active_input
     ];
     
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
@@ -121,7 +123,6 @@ $preparation_array = !empty($beverage['preparation']) ? explode(',', $beverage['
                     <div>
                         <input type="file" class="form-control" id="image" name="image" 
                                accept="image/jpeg,image/png,image/gif">
-                        <div class="form-text">JPG, PNG ou GIF. Máximo 2MB.</div>
                     </div>
                 </div>
             </div>
