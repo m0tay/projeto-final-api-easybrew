@@ -30,12 +30,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
         $upload_tmp_name = $_FILES['avatar']['tmp_name'];
         
         $allowed_extensions = ['jpg', 'jpeg', 'png'];
-        $max_size = 2 * 1024 * 1024; // 2mb only bae
+        $max_size = 2 * 1024 * 1024;
+        
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $upload_tmp_name);
+        finfo_close($finfo);
+        
+        $allowed_mimes = ['image/jpeg', 'image/png'];
         
         if (!in_array($upload_extension, $allowed_extensions)) {
             $error = 'Formato de imagem não permitido. Use JPG ou PNG.';
         } elseif ($upload_size > $max_size) {
             $error = 'Imagem muito grande. Máximo 2MB.';
+        } elseif (!in_array($mime, $allowed_mimes)) {
+            $error = 'Tipo de arquivo inválido.';
         } else {
             $avatar_filename = $data['id'] . '-img.' . $upload_extension;
             $avatar_path = AVATAR_PATH . $avatar_filename;
@@ -43,8 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'submit') 
             create_dir(AVATAR_PATH);
             
             $source_image = match($upload_extension) {
-                'jpg', 'jpeg' => imagecreatefromjpeg($upload_tmp_name),
-                'png' => imagecreatefrompng($upload_tmp_name),
+                'jpg', 'jpeg' => @imagecreatefromjpeg($upload_tmp_name),
+                'png' => @imagecreatefrompng($upload_tmp_name),
             };
             
             if ($source_image) {

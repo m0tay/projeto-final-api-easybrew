@@ -4,9 +4,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && filter_input(INPUT_POST, 'confirm')
         session_start();
     }
     require_once __DIR__ . '/../../config.php';
+    require_once __DIR__ . '/../../core.php';
     require_once __DIR__ . '/../includes/api_helper.php';
     
-    $result = callAPI('users/delete.php', ['id' => filter_input(INPUT_POST, 'id')]);
+    $user_id = filter_input(INPUT_POST, 'id');
+    $user = callAPI('users/read.php', ['id' => $user_id]);
+    
+    if (!empty($user['avatar']) && $user['avatar'] !== AVATAR_DEFAULT) {
+        delete_file(AVATAR_PATH . $user['avatar']);
+    }
+    
+    $result = callAPI('users/delete.php', ['id' => $user_id]);
     
     if (isset($result['http_code']) && $result['http_code'] == 200) {
         header('Location: ' . ADMIN_BASE_PATH . '/users/browse.php');
