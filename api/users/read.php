@@ -40,7 +40,8 @@ if ($jwt) {
             'last_name' => $user->last_name,
             'role' => $user->role,
             'balance' => $user->balance,
-            'is_active' => $user->is_active
+            'is_active' => $user->is_active,
+            'avatar' => $user->avatar
           ];
         } else {
           $code = 404;
