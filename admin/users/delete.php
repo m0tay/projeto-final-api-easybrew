@@ -102,7 +102,7 @@ if (!$user) {
             </tr>
             <tr>
                 <th>Criado em</th>
-                <td><?= date('d/m/Y H:i', strtotime($user['created_at'])) ?></td>
+                <td><?= isset($user['created_at']) ? date('d/m/Y H:i', strtotime($user['created_at'])) : 'N/A' ?></td>
             </tr>
         </table>
         
